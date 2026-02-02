@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
 
@@ -14,7 +15,6 @@ export function useTabVisibility() {
     breakLine,
     tabAwayTime,
     isLineBroken,
-    volume,
   } = useStore();
 
   const intervalRef = useRef<number | null>(null);

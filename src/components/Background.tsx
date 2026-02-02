@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { motion } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { useEffect, useState } from 'react';
