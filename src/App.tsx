@@ -95,47 +95,29 @@ function App() {
         </motion.header>
 
         {/* Main Stage */}
-        <main className="flex-1 flex items-center justify-center px-6 pb-6">
-          <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            {/* Left Panel - Timer */}
+        <main className="flex-1 flex items-center justify-center px-4 pb-6 overflow-y-auto overflow-x-hidden">
+          <div className="w-full max-w-md lg:max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center place-items-center">
+            
+            {/* Timer (Ordered 1 on Mobile, Left on Desktop) */}
             <motion.div
-              className="lg:col-span-4 flex flex-col items-center"
+              className="order-1 lg:col-span-4 w-full flex flex-col items-center"
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <div className="glass-strong p-8 w-full">
+              <div className="glass-strong p-6 lg:p-8 w-full backdrop-blur-xl">
                 <FocusTimer />
               </div>
             </motion.div>
 
-            {/* Center Stage - Capybara */}
-            <motion.div
-              className="lg:col-span-4 flex flex-col items-center justify-center gap-4"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5, type: 'spring' }}
-            >
-              <div className="relative w-full max-w-md aspect-square">
-                <CapybaraMascot isCatching={showFishModal} />
-                {/* Speech Bubble for Capy Chat */}
-                <SpeechBubble />
-              </div>
-              
-              {/* Cast Button */}
-              <motion.div
-                className="w-full max-w-xs"
-                animate={{
-                  opacity: shouldDimUI ? 0.3 : 1,
-                }}
-                transition={{ duration: 2 }}
-              >
-                <CastButton />
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              className="lg:col-span-4 flex flex-col gap-4"
+            {/* Controls (Ordered 2 on Mobile, Right Panel on Desktop) */}
+            {/* NOTE: On Desktop this was previously the right panel.
+                For Mobile First: Timer -> Controls -> Capybara (Bottom) 
+                Wait, user request: "Capybara fishing at bottom".
+                So Order: Timer -> Controls -> Capybara.
+            */}
+             <motion.div
+              className="order-2 lg:order-3 lg:col-span-4 w-full flex flex-col gap-4"
               initial={{ y: 30, opacity: 0 }}
               animate={{ 
                 y: isMiniMode ? 100 : 0, 
@@ -148,6 +130,31 @@ function App() {
 
               {/* Control Panel */}
               <ControlPanel />
+            </motion.div>
+
+            {/* Capybara (Ordered 3 on Mobile, Center on Desktop) */}
+            <motion.div
+              className="order-3 lg:order-2 lg:col-span-4 flex flex-col items-center justify-center gap-4 w-full"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.5, type: 'spring' }}
+            >
+              <div className="relative w-full max-w-[280px] lg:max-w-md aspect-square">
+                <CapybaraMascot isCatching={showFishModal} />
+                {/* Speech Bubble for Capy Chat */}
+                <SpeechBubble />
+              </div>
+              
+              {/* Cast Button */}
+              <motion.div
+                className="w-full max-w-xs z-20"
+                animate={{
+                  opacity: shouldDimUI ? 0.3 : 1,
+                }}
+                transition={{ duration: 2 }}
+              >
+                <CastButton />
+              </motion.div>
             </motion.div>
           </div>
         </main>

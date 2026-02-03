@@ -77,13 +77,13 @@ export function FocusTimer() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-8 w-full">
       {/* Session Type Toggle */}
       <div className="glass flex p-1 gap-1">
         <motion.button
           className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-medium transition-colors cursor-pointer ${
             sessionType === 'focus'
-              ? 'bg-[var(--sage-green)] text-white'
+              ? 'bg-[var(--sage-green)] text-white shadow-sm'
               : 'text-[var(--warm-brown)] hover:bg-white/20'
           }`}
           onClick={() => setSessionType('focus')}
@@ -96,7 +96,7 @@ export function FocusTimer() {
         <motion.button
           className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-medium transition-colors cursor-pointer ${
             sessionType === 'break'
-              ? 'bg-[var(--soft-blue)] text-white'
+              ? 'bg-[var(--soft-blue)] text-white shadow-sm'
               : 'text-[var(--warm-brown)] hover:bg-white/20'
           }`}
           onClick={() => setSessionType('break')}
@@ -117,7 +117,7 @@ export function FocusTimer() {
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="rgba(255, 255, 255, 0.2)"
+            stroke="rgba(255, 255, 255, 0.15)"
             strokeWidth={strokeWidth}
           />
           
@@ -156,7 +156,7 @@ export function FocusTimer() {
         {/* Timer display */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <motion.span
-            className="text-6xl font-display text-[var(--warm-brown-dark)] tabular-nums"
+            className="text-7xl font-display text-[var(--warm-brown-dark)] tabular-nums tracking-widest"
             key={timeRemaining}
             initial={{ scale: 1 }}
             animate={{ scale: timeRemaining <= 10 && isActive ? [1, 1.1, 1] : 1 }}
@@ -164,48 +164,51 @@ export function FocusTimer() {
           >
             {formatTime(timeRemaining)}
           </motion.span>
-          <span className="text-sm text-[var(--warm-brown)]/70 mt-2 uppercase tracking-wider">
+          <span className="text-sm text-[var(--warm-brown)]/70 mt-2 uppercase tracking-[0.2em] font-medium">
             {sessionType === 'focus' ? 'Focus Time' : 'Break Time'}
           </span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         {/* Reset button */}
         <motion.button
-          className="glass w-12 h-12 flex items-center justify-center text-[var(--warm-brown)] hover:bg-white/20 transition-colors cursor-pointer"
+          className="glass w-14 h-14 flex items-center justify-center text-[var(--warm-brown)] hover:bg-white/20 transition-colors cursor-pointer"
           onClick={resetTimer}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          title="Reset Timer"
         >
-          <RotateCcw className="w-5 h-5" />
+          <RotateCcw className="w-6 h-6" />
         </motion.button>
 
         {/* Play/Pause button */}
         <motion.button
-          className={`w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg cursor-pointer ${
+          className={`w-20 h-20 rounded-full flex items-center justify-center text-white shadow-xl cursor-pointer transition-all ${
             sessionType === 'focus'
-              ? 'bg-gradient-to-br from-[var(--sage-green)] to-[var(--sage-dark)]'
-              : 'bg-gradient-to-br from-[var(--soft-blue)] to-[var(--soft-blue-dark)]'
+              ? 'bg-gradient-to-br from-[var(--sage-green)] to-[var(--sage-dark)] shadow-[var(--sage-green)]/30'
+              : 'bg-gradient-to-br from-[var(--soft-blue)] to-[var(--soft-blue-dark)] shadow-[var(--soft-blue)]/30'
           }`}
           onClick={handlePlayPause}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           {!isActive || isPaused ? (
-            <Play className="w-6 h-6 ml-1" fill="currentColor" />
+            <Play className="w-8 h-8 ml-1" fill="currentColor" />
           ) : (
-            <Pause className="w-6 h-6" fill="currentColor" />
+            <Pause className="w-8 h-8" fill="currentColor" />
           )}
         </motion.button>
 
-        {/* Placeholder for symmetry */}
-        <div className="w-12 h-12" />
+        {/* Placeholder for symmetry -> Replacing with Skip/Next purely visual or potentially useful in future. 
+            For now, keeping empty div for balance but adjusting size 
+        */}
+        <div className="w-14 h-14" />
       </div>
 
       {/* Duration info */}
-      <p className="text-sm text-[var(--warm-brown)]/60">
+      <p className="text-sm text-[var(--warm-brown)]/60 font-medium tracking-wide">
         {sessionType === 'focus' ? `${focusDuration} min session` : `${breakDuration} min break`}
       </p>
     </div>

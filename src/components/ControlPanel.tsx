@@ -243,7 +243,7 @@ export function ControlPanel() {
 
       {/* Fullscreen Toggle */}
       <motion.button
-        className="w-full py-3 rounded-xl bg-white/10 text-[var(--warm-brown)] font-medium flex items-center justify-center gap-2 hover:bg-white/20 transition-colors cursor-pointer"
+        className="w-full py-3 rounded-xl bg-white/10 text-[var(--warm-brown)] font-medium flex items-center justify-center gap-2 hover:bg-white/20 transition-all duration-300 cursor-pointer"
         onClick={toggleFullscreen}
         whileTap={{ scale: 0.98 }}
       >
