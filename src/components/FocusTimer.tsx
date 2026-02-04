@@ -61,9 +61,10 @@ export function FocusTimer() {
   const totalDuration = sessionType === 'focus' ? focusDuration * 60 : breakDuration * 60;
   const progress = ((totalDuration - timeRemaining) / totalDuration) * 100;
 
-  // Circle SVG dimensions
-  const size = 280;
-  const strokeWidth = 8;
+  // Circle SVG dimensions - responsive
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const size = isMobile ? 200 : 280;
+  const strokeWidth = isMobile ? 6 : 8;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
@@ -83,7 +84,7 @@ export function FocusTimer() {
       {/* Session Type Toggle */}
       <div className="glass flex p-1 gap-1">
         <motion.button
-          className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-medium transition-colors cursor-pointer ${
+          className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
             sessionType === 'focus'
               ? 'bg-[var(--sage-green)] text-white shadow-sm'
               : 'text-[var(--warm-brown)] hover:bg-white/20 active:bg-white/30'
@@ -92,11 +93,11 @@ export function FocusTimer() {
           whileTap={{ scale: 0.95 }}
           disabled={isActive}
         >
-          <Brain className="w-4 h-4" />
+          <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           Focus
         </motion.button>
         <motion.button
-          className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-medium transition-colors cursor-pointer ${
+          className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
             sessionType === 'break'
               ? 'bg-[var(--soft-blue)] text-white shadow-sm'
               : 'text-[var(--warm-brown)] hover:bg-white/20 active:bg-white/30'
@@ -105,16 +106,16 @@ export function FocusTimer() {
           whileTap={{ scale: 0.95 }}
           disabled={isActive}
         >
-          <Coffee className="w-4 h-4" />
+          <Coffee className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           Break
         </motion.button>
       </div>
 
       {/* Time Presets (only when not active) */}
       {!isActive && (
-        <div className="w-full space-y-3">
+        <div className="w-full space-y-2 sm:space-y-3">
           {/* Quick Presets */}
-          <div className="flex justify-center gap-2">
+          <div className="flex justify-center gap-1.5 sm:gap-2">
             {[
               { focus: 25, break: 5, label: '25/5' },
               { focus: 50, break: 10, label: '50/10' },
@@ -122,7 +123,7 @@ export function FocusTimer() {
             ].map((preset) => (
               <motion.button
                 key={preset.label}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
                   focusDuration === preset.focus && breakDuration === preset.break
                     ? 'bg-[var(--sage-green)] text-white'
                     : 'glass text-[var(--warm-brown)] active:bg-white/30'
@@ -139,7 +140,7 @@ export function FocusTimer() {
           </div>
 
           {/* Custom Slider */}
-          <div className="glass p-3 space-y-2">
+          <div className="glass p-2 sm:p-3 space-y-1.5 sm:space-y-2">
             <div className="flex justify-between text-xs text-[var(--warm-brown)]/70">
               <span>Focus: {focusDuration} min</span>
               <span>Break: {breakDuration} min</span>
@@ -215,7 +216,7 @@ export function FocusTimer() {
         {/* Timer display */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <motion.span
-            className="text-7xl font-display text-[var(--warm-brown-dark)] tabular-nums tracking-widest"
+            className="text-5xl sm:text-7xl font-display text-[var(--warm-brown-dark)] tabular-nums tracking-widest"
             key={timeRemaining}
             initial={{ scale: 1 }}
             animate={{ scale: timeRemaining <= 10 && isActive ? [1, 1.1, 1] : 1 }}
@@ -223,28 +224,28 @@ export function FocusTimer() {
           >
             {formatTime(timeRemaining)}
           </motion.span>
-          <span className="text-sm text-[var(--warm-brown)]/70 mt-2 uppercase tracking-[0.2em] font-medium">
+          <span className="text-xs sm:text-sm text-[var(--warm-brown)]/70 mt-1 sm:mt-2 uppercase tracking-[0.15em] sm:tracking-[0.2em] font-medium">
             {sessionType === 'focus' ? 'Focus Time' : 'Break Time'}
           </span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 sm:gap-6">
         {/* Reset button */}
         <motion.button
-          className="glass w-14 h-14 flex items-center justify-center text-[var(--warm-brown)] hover:bg-white/20 transition-colors cursor-pointer"
+          className="glass w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center text-[var(--warm-brown)] hover:bg-white/20 transition-colors cursor-pointer"
           onClick={resetTimer}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="Reset Timer"
         >
-          <RotateCcw className="w-6 h-6" />
+          <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
         </motion.button>
 
         {/* Play/Pause button */}
         <motion.button
-          className={`w-20 h-20 rounded-full flex items-center justify-center text-white shadow-xl cursor-pointer transition-all ${
+          className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-white shadow-xl cursor-pointer transition-all ${
             sessionType === 'focus'
               ? 'bg-gradient-to-br from-[var(--sage-green)] to-[var(--sage-dark)] shadow-[var(--sage-green)]/30'
               : 'bg-gradient-to-br from-[var(--soft-blue)] to-[var(--soft-blue-dark)] shadow-[var(--soft-blue)]/30'
@@ -254,16 +255,14 @@ export function FocusTimer() {
           whileTap={{ scale: 0.95 }}
         >
           {!isActive || isPaused ? (
-            <Play className="w-8 h-8 ml-1" fill="currentColor" />
+            <Play className="w-6 h-6 sm:w-8 sm:h-8 ml-1" fill="currentColor" />
           ) : (
-            <Pause className="w-8 h-8" fill="currentColor" />
+            <Pause className="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" />
           )}
         </motion.button>
 
-        {/* Placeholder for symmetry -> Replacing with Skip/Next purely visual or potentially useful in future. 
-            For now, keeping empty div for balance but adjusting size 
-        */}
-        <div className="w-14 h-14" />
+        {/* Placeholder for symmetry */}
+        <div className="w-11 h-11 sm:w-14 sm:h-14" />
       </div>
 
       {/* Duration info */}

@@ -147,15 +147,15 @@ export function MusicCommandBar() {
       {/* Trigger Button */}
       <motion.button
         onClick={toggleCommandBar}
-        className="glass-strong px-4 py-2 flex items-center gap-2 cursor-pointer hover:bg-white/20 transition-colors"
+        className="glass-strong px-2.5 sm:px-4 py-1.5 sm:py-2 flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:bg-white/20 transition-colors"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
         <Music className="w-4 h-4 text-[var(--sage-dark)]" />
-        <span className="text-sm text-[var(--warm-brown)] hidden sm:inline">
+        <span className="text-xs sm:text-sm text-[var(--warm-brown)] hidden sm:inline max-w-[100px] sm:max-w-none truncate">
           {musicMood || 'Set the mood...'}
         </span>
-        <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-white/30 rounded-md text-[var(--warm-brown-dark)]">
+        <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs bg-white/30 rounded-md text-[var(--warm-brown-dark)]">
           ⌘K
         </kbd>
       </motion.button>
@@ -175,7 +175,7 @@ export function MusicCommandBar() {
 
             {/* Modal */}
             <motion.div
-              className="fixed top-1/4 left-1/2 w-full max-w-lg z-50 px-4"
+              className="fixed top-[10%] sm:top-1/4 left-1/2 w-[calc(100%-1rem)] sm:w-full max-w-lg z-50 px-0 sm:px-4"
               initial={{ opacity: 0, y: -20, x: '-50%' }}
               animate={{ opacity: 1, y: 0, x: '-50%' }}
               exit={{ opacity: 0, y: -20, x: '-50%' }}
@@ -185,35 +185,35 @@ export function MusicCommandBar() {
                 {/* Tabs */}
                 <div className="flex border-b border-white/10">
                   <button
-                    className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+                    className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer ${
                       activeTab === 'moods'
                         ? 'text-[var(--sage-green)] bg-[var(--sage-green)]/10'
                         : 'text-[var(--warm-brown)]/60 hover:text-[var(--warm-brown)]'
                     }`}
                     onClick={() => setActiveTab('moods')}
                   >
-                    <Sparkles className="w-4 h-4" />
+                    <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     Mood Presets
                   </button>
                   <button
-                    className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+                    className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer ${
                       activeTab === 'custom'
                         ? 'text-[var(--sage-green)] bg-[var(--sage-green)]/10'
                         : 'text-[var(--warm-brown)]/60 hover:text-[var(--warm-brown)]'
                     }`}
                     onClick={() => setActiveTab('custom')}
                   >
-                    <Link2 className="w-4 h-4" />
-                    Dán URL YouTube
+                    <Link2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    Dán URL
                   </button>
                 </div>
 
                 {/* Input */}
-                <div className="flex items-center gap-3 px-4 py-4 border-b border-white/10">
+                <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-4 border-b border-white/10">
                   {activeTab === 'moods' ? (
-                    <Search className="w-5 h-5 text-[var(--sage-green)]" />
+                    <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--sage-green)] flex-shrink-0" />
                   ) : (
-                    <Link2 className="w-5 h-5 text-[var(--sage-green)]" />
+                    <Link2 className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--sage-green)] flex-shrink-0" />
                   )}
                   <input
                     ref={inputRef}
@@ -223,15 +223,15 @@ export function MusicCommandBar() {
                     onKeyDown={handleKeyDown}
                     placeholder={
                       activeTab === 'moods'
-                        ? "Tâm trạng hôm nay? (vd: 'coding', 'mưa', 'jazz')"
-                        : "Dán link YouTube video hoặc playlist..."
+                        ? "Tâm trạng? (vd: 'coding', 'mưa')"
+                        : "Dán link YouTube..."
                     }
-                    className="flex-1 bg-transparent text-[var(--warm-brown-dark)] placeholder-[var(--warm-brown)]/50 outline-none text-lg"
+                    className="flex-1 bg-transparent text-[var(--warm-brown-dark)] placeholder-[var(--warm-brown)]/50 outline-none text-sm sm:text-lg min-w-0"
                   />
                   {inputValue && (
                     <button
                       onClick={() => setInputValue('')}
-                      className="p-1 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                      className="p-1 hover:bg-white/10 rounded-full transition-colors cursor-pointer flex-shrink-0"
                     >
                       <X className="w-4 h-4 text-[var(--warm-brown)]/60" />
                     </button>
@@ -239,13 +239,13 @@ export function MusicCommandBar() {
                 </div>
 
                 {/* Content Area */}
-                <div className="max-h-72 overflow-y-auto p-2">
+                <div className="max-h-56 sm:max-h-72 overflow-y-auto p-1.5 sm:p-2">
                   {activeTab === 'moods' ? (
                     // Mood suggestions
                     suggestions.map((suggestion, index) => (
                       <motion.button
                         key={suggestion.mood}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors cursor-pointer ${
+                        className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-left transition-colors cursor-pointer ${
                           index === selectedIndex
                             ? 'bg-[var(--sage-green)]/20'
                             : 'hover:bg-white/10'
@@ -253,19 +253,19 @@ export function MusicCommandBar() {
                         onClick={() => handleSubmit(suggestion)}
                         whileHover={{ x: 4 }}
                       >
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--sage-light)] to-[var(--soft-blue)] flex items-center justify-center text-lg">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[var(--sage-light)] to-[var(--soft-blue)] flex items-center justify-center text-base sm:text-lg flex-shrink-0">
                           {suggestion.emoji || '🎵'}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-[var(--warm-brown-dark)]">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm sm:text-base font-medium text-[var(--warm-brown-dark)] truncate">
                             {suggestion.mood}
                           </p>
-                          <p className="text-sm text-[var(--warm-brown)]/70">
+                          <p className="text-xs sm:text-sm text-[var(--warm-brown)]/70 truncate">
                             {suggestion.description}
                           </p>
                         </div>
                         {index === selectedIndex && (
-                          <span className="text-xs text-[var(--sage-green)] font-medium">
+                          <span className="text-[10px] sm:text-xs text-[var(--sage-green)] font-medium hidden sm:inline">
                             ↵ Enter
                           </span>
                         )}

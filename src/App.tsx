@@ -48,7 +48,7 @@ function App() {
 
       {/* Watermark */}
       {!isMiniMode && (
-        <div className="fixed top-3 left-1/2 transform -translate-x-1/2 z-50 font-display text-[10px] font-bold text-[var(--warm-brown)]/30 tracking-[0.2em] select-none pointer-events-none uppercase">
+        <div className="fixed top-2 sm:top-3 left-1/2 transform -translate-x-1/2 z-50 font-display text-[8px] sm:text-[10px] font-bold text-[var(--warm-brown)]/30 tracking-[0.2em] select-none pointer-events-none uppercase">
           WEB CỦA THIÊN QUỐC
         </div>
       )}
@@ -65,7 +65,7 @@ function App() {
       >
         {/* Header */}
         <motion.header 
-          className="flex items-center justify-between px-6 py-4"
+          className="flex items-center justify-between px-3 sm:px-6 py-2 sm:py-4"
           animate={{
             opacity: isMiniMode ? 0 : (shouldDimUI ? 0.3 : 1),
             y: isMiniMode ? -100 : 0,
@@ -74,13 +74,13 @@ function App() {
         >
           {/* Logo */}
           <motion.div
-            className="flex items-center gap-3"
+            className="flex items-center gap-2 sm:gap-3"
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <span className="text-3xl">🦫</span>
-            <h1 className="text-2xl font-display text-[var(--warm-brown-dark)]">
+            <span className="text-2xl sm:text-3xl">🦫</span>
+            <h1 className="text-lg sm:text-2xl font-display text-[var(--warm-brown-dark)]">
               CapyFlow
             </h1>
           </motion.div>
@@ -96,8 +96,8 @@ function App() {
         </motion.header>
 
         {/* Main Stage */}
-        <main className="flex-1 flex items-center justify-center px-4 pb-6 overflow-y-auto overflow-x-hidden">
-          <div className="w-full max-w-md lg:max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center place-items-center">
+        <main className="flex-1 flex items-start sm:items-center justify-center px-2 sm:px-4 pb-4 sm:pb-6 pt-2 sm:pt-0 overflow-y-auto overflow-x-hidden">
+          <div className="w-full max-w-md lg:max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-6 lg:gap-8 items-center place-items-center">
             
             {/* Timer (Ordered 1 on Mobile, Left on Desktop) */}
             <motion.div
@@ -106,7 +106,7 @@ function App() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <div className="glass-strong p-6 lg:p-8 w-full backdrop-blur-xl">
+              <div className="glass-strong p-4 sm:p-6 lg:p-8 w-full backdrop-blur-xl">
                 <FocusTimer />
               </div>
             </motion.div>
@@ -135,12 +135,12 @@ function App() {
 
             {/* Capybara (Ordered 3 on Mobile, Center on Desktop) */}
             <motion.div
-              className="order-3 lg:order-2 lg:col-span-4 flex flex-col items-center justify-center gap-4 w-full"
+              className="order-3 lg:order-2 lg:col-span-4 flex flex-col items-center justify-center gap-2 sm:gap-4 w-full"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.5, type: 'spring' }}
             >
-              <div className="relative w-full max-w-[280px] lg:max-w-md aspect-square">
+              <div className="relative w-full max-w-[180px] sm:max-w-[280px] lg:max-w-md aspect-square">
                 <CapybaraMascot isCatching={showFishModal} />
                 {/* Speech Bubble for Capy Chat */}
                 <SpeechBubble />

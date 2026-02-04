@@ -145,12 +145,12 @@ export function VinylPlayer() {
 
   if (!videoId && !playlistId) {
     return (
-      <div className="glass p-4 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-[var(--warm-brown)]/20 flex items-center justify-center">
-          <Music2 className="w-6 h-6 text-[var(--warm-brown)]/50" />
+      <div className="glass p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--warm-brown)]/20 flex items-center justify-center">
+          <Music2 className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--warm-brown)]/50" />
         </div>
-        <p className="text-sm text-[var(--warm-brown)]/60">
-          Nhấn ⌘K hoặc click "Set the mood..." để chọn nhạc
+        <p className="text-xs sm:text-sm text-[var(--warm-brown)]/60">
+          Nhấn ⌘K hoặc click "Set the mood..."
         </p>
       </div>
     );
@@ -180,7 +180,7 @@ export function VinylPlayer() {
   }
 
   return (
-    <div className="glass p-4">
+    <div className="glass p-3 sm:p-4">
       {/* Hidden YouTube player */}
       <div className="hidden">
         <YouTube
@@ -238,11 +238,11 @@ export function VinylPlayer() {
       </AnimatePresence>
 
       {/* Vinyl UI */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4">
         {/* Spinning vinyl */}
         <div className="relative">
           <motion.div
-            className={`w-14 h-14 rounded-full shadow-lg ${
+            className={`w-10 h-10 sm:w-14 sm:h-14 rounded-full shadow-lg ${
               isPlaying ? 'animate-vinyl-spin-slow' : ''
             }`}
             style={{
@@ -257,8 +257,8 @@ export function VinylPlayer() {
           >
             {/* Center label */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-5 h-5 rounded-full bg-[var(--sage-green)] flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-white/80" />
+              <div className="w-3.5 h-3.5 sm:w-5 sm:h-5 rounded-full bg-[var(--sage-green)] flex items-center justify-center">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white/80" />
               </div>
             </div>
           </motion.div>
@@ -266,7 +266,7 @@ export function VinylPlayer() {
           {/* Playing indicator */}
           {isPlaying && (
             <motion.div
-              className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[var(--sage-green)]"
+              className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[var(--sage-green)]"
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
@@ -275,46 +275,46 @@ export function VinylPlayer() {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-[var(--warm-brown-dark)] truncate">
+          <p className="text-sm sm:text-base font-medium text-[var(--warm-brown-dark)] truncate">
             {musicMood || 'Now Playing'}
           </p>
-          <p className="text-sm text-[var(--warm-brown)]/60 truncate">
+          <p className="text-xs sm:text-sm text-[var(--warm-brown)]/60 truncate">
             {playlistId ? 'Playlist' : 'Video'} ∙ {isPlaying ? 'Đang phát' : 'Tạm dừng'}
           </p>
         </div>
 
         {/* Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Play/Pause */}
           <motion.button
-            className="w-10 h-10 rounded-full bg-[var(--sage-green)]/20 flex items-center justify-center text-[var(--sage-green)] hover:bg-[var(--sage-green)]/30 transition-colors cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[var(--sage-green)]/20 flex items-center justify-center text-[var(--sage-green)] hover:bg-[var(--sage-green)]/30 transition-colors cursor-pointer"
             onClick={togglePlay}
             whileTap={{ scale: 0.9 }}
           >
             {isPlaying ? (
-              <Pause className="w-4 h-4" fill="currentColor" />
+              <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" />
             ) : (
-              <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
+              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-0.5" fill="currentColor" />
             )}
           </motion.button>
 
           {/* Volume */}
           <motion.button
-            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-[var(--warm-brown)] hover:bg-white/20 transition-colors cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-[var(--warm-brown)] hover:bg-white/20 transition-colors cursor-pointer"
             onClick={toggleMute}
             whileTap={{ scale: 0.9 }}
           >
             {isMuted ? (
-              <VolumeX className="w-4 h-4" />
+              <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             ) : (
-              <Volume2 className="w-4 h-4" />
+              <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             )}
           </motion.button>
         </div>
       </div>
 
       {/* Volume slider */}
-      <div className="mt-3 flex items-center gap-3">
+      <div className="mt-2 sm:mt-3 flex items-center gap-2 sm:gap-3">
         <input
           type="range"
           min="0"
@@ -322,12 +322,12 @@ export function VinylPlayer() {
           step="0.01"
           value={volume}
           onChange={(e) => setVolume(parseFloat(e.target.value))}
-          className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
+          className="flex-1 h-1.5 sm:h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, var(--sage-green) 0%, var(--sage-green) ${volume * 100}%, rgba(255,255,255,0.2) ${volume * 100}%, rgba(255,255,255,0.2) 100%)`,
           }}
         />
-        <span className="text-xs text-[var(--warm-brown)]/60 w-8">
+        <span className="text-[10px] sm:text-xs text-[var(--warm-brown)]/60 w-7 sm:w-8">
           {Math.round(volume * 100)}%
         </span>
       </div>

@@ -92,26 +92,26 @@ export function ControlPanel() {
   const themes: ThemeType[] = ['sunny', 'rainy', 'night'];
 
   return (
-    <div className="glass p-4 space-y-4">
+    <div className="glass p-3 sm:p-4 space-y-3 sm:space-y-4">
       {/* Toggle Switches */}
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         <ToggleSwitch
           enabled={autoTheme}
           onChange={toggleAutoTheme}
           label="Auto Theme"
-          icon={<Clock className="w-4 h-4" />}
+          icon={<Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
         />
         <ToggleSwitch
           enabled={soundEnabled}
           onChange={toggleSound}
           label="ASMR Sounds"
-          icon={soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          icon={soundEnabled ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
         />
         <ToggleSwitch
           enabled={focusFogEnabled}
           onChange={toggleFocusFog}
           label="Focus Fog"
-          icon={<Sparkles className="w-4 h-4" />}
+          icon={<Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
         />
       </div>
 
@@ -156,20 +156,20 @@ export function ControlPanel() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white/10 rounded-xl p-3 text-center">
-          <div className="flex items-center justify-center gap-2 text-[var(--soft-blue)]">
-            <Fish className="w-4 h-4" />
-            <span className="text-2xl font-display">{fishCaughtCount}</span>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="bg-white/10 rounded-xl p-2 sm:p-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-[var(--soft-blue)]">
+            <Fish className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="text-xl sm:text-2xl font-display">{fishCaughtCount}</span>
           </div>
-          <p className="text-xs text-[var(--warm-brown)]/60 mt-1">Fish Caught</p>
+          <p className="text-[10px] sm:text-xs text-[var(--warm-brown)]/60 mt-0.5 sm:mt-1">Fish Caught</p>
         </div>
-        <div className="bg-white/10 rounded-xl p-3 text-center">
-          <div className="flex items-center justify-center gap-2 text-[var(--sage-green)]">
-            <Flame className="w-4 h-4" />
-            <span className="text-2xl font-display">{currentStreak}</span>
+        <div className="bg-white/10 rounded-xl p-2 sm:p-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-[var(--sage-green)]">
+            <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="text-xl sm:text-2xl font-display">{currentStreak}</span>
           </div>
-          <p className="text-xs text-[var(--warm-brown)]/60 mt-1">Focus Streak</p>
+          <p className="text-[10px] sm:text-xs text-[var(--warm-brown)]/60 mt-0.5 sm:mt-1">Focus Streak</p>
         </div>
       </div>
 
@@ -243,19 +243,19 @@ export function ControlPanel() {
 
       {/* Fullscreen Toggle */}
       <motion.button
-        className="w-full py-3 rounded-xl bg-white/10 text-[var(--warm-brown)] font-medium flex items-center justify-center gap-2 hover:bg-white/20 transition-all duration-300 cursor-pointer"
+        className="w-full py-2.5 sm:py-3 rounded-xl bg-white/10 text-[var(--warm-brown)] text-sm sm:text-base font-medium flex items-center justify-center gap-2 hover:bg-white/20 transition-all duration-300 cursor-pointer"
         onClick={toggleFullscreen}
         whileTap={{ scale: 0.98 }}
       >
         {isFullscreen ? (
           <>
-            <Minimize className="w-4 h-4" />
+            <Minimize className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Exit Fullscreen
           </>
         ) : (
           <>
-            <Maximize className="w-4 h-4" />
-            Deep Immersion Mode
+            <Maximize className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            Deep Immersion
           </>
         )}
       </motion.button>
