@@ -15,11 +15,12 @@ const rarityLabels = {
 };
 
 export function FishCaughtModal() {
-  const { showFishModal, lastCaughtFish, closeFishModal, fishCaughtCount } = useStore();
+  const { showFishModal, lastCaughtFish, closeFishModal, fishCaughtCount, lastFishQuote } = useStore();
 
   if (!lastCaughtFish) return null;
 
   const rarity = lastCaughtFish.rarity as keyof typeof rarityColors;
+  const isGlowing = lastCaughtFish.glowing;
 
   return (
     <AnimatePresence>
@@ -36,7 +37,7 @@ export function FishCaughtModal() {
 
           {/* Modal */}
           <motion.div
-            className="fixed top-1/2 left-1/2 z-50 w-full max-w-sm"
+            className="fixed top-1/2 left-1/2 z-50 w-full max-w-sm px-4"
             initial={{ opacity: 0, scale: 0.8, x: '-50%', y: '-50%' }}
             animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
             exit={{ opacity: 0, scale: 0.8, x: '-50%', y: '-50%' }}
@@ -78,14 +79,14 @@ export function FishCaughtModal() {
               {/* Close button */}
               <button
                 onClick={closeFishModal}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-colors cursor-pointer"
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5 text-[var(--warm-brown)]" />
               </button>
 
-              {/* Icon */}
+              {/* Icon with optional glow effect */}
               <motion.div
-                className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br flex items-center justify-center shadow-lg"
+                className={`w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br flex items-center justify-center shadow-lg ${isGlowing ? 'animate-glow' : ''}`}
                 initial={{ rotate: -10 }}
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 0.5, delay: 0.3 }}
@@ -125,6 +126,20 @@ export function FishCaughtModal() {
                   {rarityLabels[rarity]}
                 </span>
               </motion.div>
+
+              {/* Philosophical Quote */}
+              {lastFishQuote && (
+                <motion.div
+                  className="mt-4 p-4 glass rounded-xl"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <p className="text-sm text-[var(--warm-brown)] italic leading-relaxed">
+                    "{lastFishQuote}"
+                  </p>
+                </motion.div>
+              )}
 
               {/* Stats */}
               <motion.div

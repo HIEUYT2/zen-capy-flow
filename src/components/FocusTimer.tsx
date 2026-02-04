@@ -18,6 +18,8 @@ export function FocusTimer() {
     tick,
     completeSession,
     setSessionType,
+    setFocusDuration,
+    setBreakDuration,
   } = useStore();
 
   const intervalRef = useRef<number | null>(null);
@@ -77,14 +79,14 @@ export function FocusTimer() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full">
+    <div className="flex flex-col items-center gap-6 w-full">
       {/* Session Type Toggle */}
       <div className="glass flex p-1 gap-1">
         <motion.button
           className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-medium transition-colors cursor-pointer ${
             sessionType === 'focus'
               ? 'bg-[var(--sage-green)] text-white shadow-sm'
-              : 'text-[var(--warm-brown)] hover:bg-white/20'
+              : 'text-[var(--warm-brown)] hover:bg-white/20 active:bg-white/30'
           }`}
           onClick={() => setSessionType('focus')}
           whileTap={{ scale: 0.95 }}
@@ -97,7 +99,7 @@ export function FocusTimer() {
           className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-medium transition-colors cursor-pointer ${
             sessionType === 'break'
               ? 'bg-[var(--soft-blue)] text-white shadow-sm'
-              : 'text-[var(--warm-brown)] hover:bg-white/20'
+              : 'text-[var(--warm-brown)] hover:bg-white/20 active:bg-white/30'
           }`}
           onClick={() => setSessionType('break')}
           whileTap={{ scale: 0.95 }}
@@ -107,6 +109,63 @@ export function FocusTimer() {
           Break
         </motion.button>
       </div>
+
+      {/* Time Presets (only when not active) */}
+      {!isActive && (
+        <div className="w-full space-y-3">
+          {/* Quick Presets */}
+          <div className="flex justify-center gap-2">
+            {[
+              { focus: 25, break: 5, label: '25/5' },
+              { focus: 50, break: 10, label: '50/10' },
+              { focus: 90, break: 20, label: '90/20' },
+            ].map((preset) => (
+              <motion.button
+                key={preset.label}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
+                  focusDuration === preset.focus && breakDuration === preset.break
+                    ? 'bg-[var(--sage-green)] text-white'
+                    : 'glass text-[var(--warm-brown)] active:bg-white/30'
+                }`}
+                onClick={() => {
+                  setFocusDuration(preset.focus);
+                  setBreakDuration(preset.break);
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {preset.label}
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Custom Slider */}
+          <div className="glass p-3 space-y-2">
+            <div className="flex justify-between text-xs text-[var(--warm-brown)]/70">
+              <span>Focus: {focusDuration} min</span>
+              <span>Break: {breakDuration} min</span>
+            </div>
+            <input
+              type="range"
+              min="5"
+              max="120"
+              step="5"
+              value={focusDuration}
+              onChange={(e) => {
+                const newFocus = parseInt(e.target.value);
+                setFocusDuration(newFocus);
+                // Auto-adjust break time (roughly 1/5 of focus)
+                setBreakDuration(Math.max(5, Math.round(newFocus / 5)));
+              }}
+              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[var(--sage-green)]"
+            />
+            <div className="flex justify-between text-[10px] text-[var(--warm-brown)]/50">
+              <span>5m</span>
+              <span>60m</span>
+              <span>120m</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Timer Circle */}
       <div className="relative">

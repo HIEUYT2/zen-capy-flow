@@ -13,6 +13,7 @@ import { FocusHeatmap } from './components/FocusHeatmap';
 import { RainCanvas } from './components/RainCanvas';
 import { CapyChat, SpeechBubble } from './components/CapyChat';
 import { MiniModeButton } from './components/MiniMode';
+import { FloatingNotes } from './components/FloatingNotes';
 import { useTabVisibility } from './hooks/useTabVisibility';
 import { useAutoTheme } from './hooks/useAutoTheme';
 import { useSoundEffects } from './hooks/useSoundEffects';
@@ -185,6 +186,9 @@ function App() {
 
       {/* Capy Chat Button + Panel */}
       {!isMiniMode && <CapyChat />}
+
+      {/* Floating Notes (Lotus icon for distraction notes) */}
+      <FloatingNotes />
     </div>
   );
 }

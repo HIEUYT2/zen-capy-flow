@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { motion, AnimatePresence, type Easing } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { useSoundEffects } from '../hooks/useSoundEffects';
@@ -309,11 +310,16 @@ export function CapybaraMascot({ isCatching = false }: CapybaraMascotProps) {
     isLineBroken,
     showFishModal,
     capyMood,
-    petCapy,
     isCasting,
     equippedAccessory,
+    handleCapyTap,
+    handleCapyLongPress,
   } = useStore();
   const { playPetSound } = useSoundEffects();
+
+  // Touch handling state
+  const touchStartTime = useRef<number>(0);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getCurrentState = () => {
     if (isCatching || showFishModal) return 'catch';
@@ -321,16 +327,45 @@ export function CapybaraMascot({ isCatching = false }: CapybaraMascotProps) {
     if (capyMood === 'sleeping') return 'sleeping';
     if (capyMood === 'waking') return 'waking';
     if (capyMood === 'happy') return 'happy';
+    if (capyMood === 'annoyed') return 'idle'; // Use idle animation but show annoyed face
     if (isCasting) return 'fishing';
     return 'idle';
   };
 
   const currentState = getCurrentState();
+  const isAnnoyed = capyMood === 'annoyed';
 
-  const handleClick = () => {
-    if (capyMood !== 'sleeping') {
-      petCapy();
+  // Touch/Click handlers for mobile interaction
+  const handleTouchStart = () => {
+    touchStartTime.current = Date.now();
+    
+    // Start long press timer (500ms)
+    longPressTimer.current = setTimeout(() => {
+      handleCapyLongPress();
       playPetSound();
+    }, 500);
+  };
+
+  const handleTouchEnd = () => {
+    const touchDuration = Date.now() - touchStartTime.current;
+    
+    // Clear long press timer
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    
+    // If it was a short tap (not a long press)
+    if (touchDuration < 500 && capyMood !== 'sleeping') {
+      handleCapyTap();
+      playPetSound();
+    }
+  };
+
+  const handleTouchCancel = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
     }
   };
 
@@ -338,9 +373,13 @@ export function CapybaraMascot({ isCatching = false }: CapybaraMascotProps) {
     <div className="relative w-full h-full flex items-center justify-center">
       <motion.svg
         viewBox="0 0 400 350"
-        className="w-full max-w-lg h-auto cursor-pointer"
+        className={`w-full max-w-lg h-auto cursor-pointer ${isAnnoyed ? 'animate-annoyed' : ''}`}
         style={{ filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.15))' }}
-        onClick={handleClick}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
+        onMouseDown={handleTouchStart}
+        onMouseUp={handleTouchEnd}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >

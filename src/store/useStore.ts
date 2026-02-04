@@ -1,19 +1,55 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// Fish types for rewards
-export const FISH_TYPES = [
-  { name: 'Golden Koi', rarity: 'legendary', emoji: '🐟' },
-  { name: 'Rainbow Trout', rarity: 'rare', emoji: '🌈' },
-  { name: 'Zen Carp', rarity: 'common', emoji: '🐠' },
-  { name: 'Crystal Salmon', rarity: 'rare', emoji: '💎' },
-  { name: 'Moonfish', rarity: 'legendary', emoji: '🌙' },
-  { name: 'Sunset Bass', rarity: 'common', emoji: '🌅' },
-  { name: 'Lucky Catfish', rarity: 'common', emoji: '🍀' },
-  { name: 'Starfish Spirit', rarity: 'rare', emoji: '⭐' },
-  { name: 'Dream Guppy', rarity: 'common', emoji: '💭' },
-  { name: 'Phoenix Betta', rarity: 'legendary', emoji: '🔥' },
+// Weather-based Fish Types
+export const MORNING_FISH = [
+  { name: 'Zen Carp', rarity: 'common', emoji: '🐠', timeOfDay: 'morning' },
+  { name: 'Sunset Bass', rarity: 'common', emoji: '🌅', timeOfDay: 'morning' },
+  { name: 'Lucky Catfish', rarity: 'common', emoji: '🍀', timeOfDay: 'morning' },
+  { name: 'Dream Guppy', rarity: 'common', emoji: '💭', timeOfDay: 'morning' },
+  { name: 'Rainbow Trout', rarity: 'rare', emoji: '🌈', timeOfDay: 'morning' },
 ];
+
+export const NIGHT_FISH = [
+  { name: 'Moonfish', rarity: 'legendary', emoji: '🌙', timeOfDay: 'night', glowing: true },
+  { name: 'Starfish Spirit', rarity: 'rare', emoji: '⭐', timeOfDay: 'night', glowing: true },
+  { name: 'Crystal Salmon', rarity: 'rare', emoji: '💎', timeOfDay: 'night', glowing: true },
+  { name: 'Firefly Minnow', rarity: 'common', emoji: '✨', timeOfDay: 'night', glowing: true },
+  { name: 'Biolumi Jellyfish', rarity: 'legendary', emoji: '🪼', timeOfDay: 'night', glowing: true },
+];
+
+export const RAINY_FISH = [
+  { name: 'Storm Koi', rarity: 'legendary', emoji: '⚡', timeOfDay: 'rainy' },
+  { name: 'Rain Spirit', rarity: 'rare', emoji: '🌧️', timeOfDay: 'rainy' },
+  { name: 'Thunder Bass', rarity: 'legendary', emoji: '⛈️', timeOfDay: 'rainy' },
+  { name: 'Misty Pike', rarity: 'rare', emoji: '🌫️', timeOfDay: 'rainy' },
+  { name: 'Cloud Carp', rarity: 'common', emoji: '☁️', timeOfDay: 'rainy' },
+];
+
+// Combined fish types (legacy support)
+export const FISH_TYPES = [...MORNING_FISH, ...NIGHT_FISH, ...RAINY_FISH];
+
+// Philosophical Capybara Quotes (shown when catching fish)
+export const CAPY_FISHING_QUOTES = [
+  "Chậm rãi như Capybara, vững chắc như dòng nước 🦫",
+  "Mỗi con cá là một khoảnh khắc bình yên ✨",
+  "Kiên nhẫn không phải là chờ đợi, mà là biết tận hưởng 🌸",
+  "Hơi thở sâu, tâm an yên, cá tự đến 🐟",
+  "Không vội vàng, không lo lắng - đó là triết lý Capybara 🍃",
+  "Thành công đến với ai biết thư giãn đúng lúc 🌿",
+  "Nước chảy đá mòn, kiên trì ắt thành công 💧",
+  "Hôm nay ta nghỉ ngơi, ngày mai ta chinh phục 🌅",
+  "Cá không chạy đi đâu, bạn cũng vậy - hãy ở lại với hiện tại 🧘",
+  "Mỗi phút tập trung là một viên ngọc quý 💎",
+];
+
+// Floating Note interface
+export interface FloatingNote {
+  id: string;
+  text: string;
+  createdAt: Date;
+  shown: boolean; // Whether it was shown during break
+}
 
 // Accessory rewards based on streak
 export const ACCESSORY_REWARDS = [
@@ -26,7 +62,7 @@ export const ACCESSORY_REWARDS = [
 
 export type Theme = 'sunny' | 'rainy' | 'night';
 export type SessionType = 'focus' | 'break';
-export type CapyMood = 'idle' | 'sleeping' | 'happy' | 'fishing' | 'waking';
+export type CapyMood = 'idle' | 'sleeping' | 'happy' | 'fishing' | 'waking' | 'annoyed';
 
 export interface Fish {
   id: string;
@@ -34,6 +70,8 @@ export interface Fish {
   rarity: string;
   emoji: string;
   caughtAt: Date;
+  timeOfDay?: string;
+  glowing?: boolean;
 }
 
 export interface Accessory {
@@ -161,6 +199,11 @@ interface CapyFlowState {
   capyChatMessage: string;
   lastCapyResponse: string;
 
+  // Floating Notes (Distraction thoughts to release)
+  floatingNotes: FloatingNote[];
+  showFloatingNotesInput: boolean;
+  lastFishQuote: string;
+
   // Actions
   startTimer: () => void;
   pauseTimer: () => void;
@@ -226,6 +269,18 @@ interface CapyFlowState {
   // Capy Chat
   toggleCapyChat: () => void;
   sendCapyMessage: (message: string) => void;
+
+  // Floating Notes
+  addFloatingNote: (text: string) => void;
+  toggleFloatingNotesInput: () => void;
+  markNotesAsShown: () => void;
+  getUnshownNotes: () => FloatingNote[];
+
+  // Capybara Tap Interactions
+  tapCount: number;
+  lastTapTime: number;
+  handleCapyTap: () => void;
+  handleCapyLongPress: () => void;
 }
 
 export const useStore = create<CapyFlowState>()(
@@ -300,6 +355,15 @@ export const useStore = create<CapyFlowState>()(
       showCapyChat: false,
       capyChatMessage: '',
       lastCapyResponse: '',
+
+      // Floating Notes
+      floatingNotes: [],
+      showFloatingNotesInput: false,
+      lastFishQuote: '',
+
+      // Tap Interactions
+      tapCount: 0,
+      lastTapTime: 0,
 
       // Timer Actions
       startTimer: () => set({
@@ -406,20 +470,36 @@ export const useStore = create<CapyFlowState>()(
       toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
       setIsPlaying: (playing) => set({ isPlaying: playing }),
 
-      // Fish Actions
+      // Fish Actions - Weather-based selection
       catchFish: () => {
-        const randomFish = FISH_TYPES[Math.floor(Math.random() * FISH_TYPES.length)];
+        const { theme } = get();
+        
+        // Select fish pool based on current theme/weather
+        let fishPool;
+        if (theme === 'night') {
+          fishPool = NIGHT_FISH;
+        } else if (theme === 'rainy') {
+          fishPool = RAINY_FISH;
+        } else {
+          fishPool = MORNING_FISH;
+        }
+        
+        const randomFish = fishPool[Math.floor(Math.random() * fishPool.length)];
         const newFish: Fish = {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           ...randomFish,
           caughtAt: new Date(),
         };
 
+        // Get random philosophical quote
+        const randomQuote = CAPY_FISHING_QUOTES[Math.floor(Math.random() * CAPY_FISHING_QUOTES.length)];
+
         set((state) => ({
           fishCaughtCount: state.fishCaughtCount + 1,
           fishCollection: [...state.fishCollection, newFish],
           currentStreak: state.currentStreak + 1,
           lastCaughtFish: newFish,
+          lastFishQuote: randomQuote,
         }));
 
         return newFish;
@@ -576,6 +656,78 @@ export const useStore = create<CapyFlowState>()(
         setTimeout(() => {
           set({ lastCapyResponse: '' });
         }, 5000);
+      },
+
+      // Floating Notes Actions
+      addFloatingNote: (text) => set((state) => ({
+        floatingNotes: [
+          ...state.floatingNotes,
+          {
+            id: `note-${Date.now()}`,
+            text,
+            createdAt: new Date(),
+            shown: false,
+          },
+        ],
+        showFloatingNotesInput: false,
+      })),
+
+      toggleFloatingNotesInput: () => set((state) => ({
+        showFloatingNotesInput: !state.showFloatingNotesInput,
+      })),
+
+      markNotesAsShown: () => set((state) => ({
+        floatingNotes: state.floatingNotes.map(note => ({ ...note, shown: true })),
+      })),
+
+      getUnshownNotes: () => {
+        return get().floatingNotes.filter(note => !note.shown);
+      },
+
+      // Capybara Tap Interactions
+      handleCapyTap: () => {
+        const now = Date.now();
+        const { lastTapTime, tapCount, capyMood } = get();
+        
+        // If taps are within 1 second, increment count
+        if (now - lastTapTime < 1000) {
+          const newCount = tapCount + 1;
+          
+          // 3+ rapid taps = annoyed
+          if (newCount >= 3) {
+            set({ capyMood: 'annoyed', tapCount: 0, lastTapTime: now });
+            setTimeout(() => {
+              if (get().capyMood === 'annoyed') {
+                set({ capyMood: 'idle' });
+              }
+            }, 2000);
+          } else {
+            set({ tapCount: newCount, lastTapTime: now });
+          }
+        } else {
+          // Normal single tap = wiggle happy
+          set({ capyMood: 'happy', tapCount: 1, lastTapTime: now });
+          setTimeout(() => {
+            if (get().capyMood === 'happy') {
+              set({ capyMood: 'idle' });
+            }
+          }, 800);
+        }
+      },
+
+      handleCapyLongPress: () => {
+        set({ capyMood: 'sleeping' });
+        // Wake up after 3 seconds if still sleeping
+        setTimeout(() => {
+          if (get().capyMood === 'sleeping') {
+            set({ capyMood: 'waking' });
+            setTimeout(() => {
+              if (get().capyMood === 'waking') {
+                set({ capyMood: 'idle' });
+              }
+            }, 1000);
+          }
+        }, 3000);
       },
     }),
     {
