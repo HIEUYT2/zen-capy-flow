@@ -1,13 +1,20 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import YouTube from 'react-youtube';
-import { motion } from 'framer-motion';
-import { Volume2, VolumeX, Play, Pause, Music2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Volume2, VolumeX, Play, Pause, Music2, AlertCircle, RefreshCw } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { MUSIC_MAPPINGS } from '../lib/musicMapper';
 
 export function VinylPlayer() {
   const playerRef = useRef<any>(null);
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [needsInteraction, setNeedsInteraction] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
+  
   const {
     videoId,
+    playlistId,
     volume,
     isMuted,
     isPlaying,
@@ -16,6 +23,7 @@ export function VinylPlayer() {
     setIsPlaying,
     setVolume,
     toggleMute,
+    setVideoId,
   } = useStore();
 
   // Handle player ready
@@ -25,13 +33,58 @@ export function VinylPlayer() {
     if (isMuted) {
       event.target.mute();
     }
+    setHasError(false);
+    setErrorMessage('');
   };
 
   // Handle state change
   const onStateChange = (event: any) => {
-    // 1 = playing, 2 = paused
-    setIsPlaying(event.data === 1);
+    // 1 = playing, 2 = paused, -1 = unstarted, 0 = ended
+    if (event.data === 1) {
+      setIsPlaying(true);
+      setNeedsInteraction(false);
+    } else if (event.data === 2 || event.data === 0) {
+      setIsPlaying(false);
+    }
   };
+
+  // Handle errors
+  const onError = (event: any) => {
+    console.error('YouTube Player Error:', event.data);
+    setHasError(true);
+    
+    // Error codes: 2 (invalid param), 5 (HTML5 error), 100 (video not found), 101/150 (embed not allowed)
+    switch (event.data) {
+      case 100:
+        setErrorMessage('Video không tồn tại hoặc đã bị xóa');
+        break;
+      case 101:
+      case 150:
+        setErrorMessage('Video này không cho phép nhúng');
+        break;
+      default:
+        setErrorMessage('Không thể phát video này');
+    }
+
+    // Try backup video if available
+    if (retryCount < 2) {
+      const currentMapping = MUSIC_MAPPINGS.find(m => m.videoId === videoId);
+      if (currentMapping?.backupVideoIds && currentMapping.backupVideoIds[retryCount]) {
+        setTimeout(() => {
+          setVideoId(currentMapping.backupVideoIds![retryCount]);
+          setRetryCount(prev => prev + 1);
+          setHasError(false);
+        }, 1000);
+      }
+    }
+  };
+
+  // Reset retry count when videoId changes externally
+  useEffect(() => {
+    setRetryCount(0);
+    setHasError(false);
+    setErrorMessage('');
+  }, [videoId]);
 
   // Volume control based on tab visibility
   useEffect(() => {
@@ -68,21 +121,62 @@ export function VinylPlayer() {
         playerRef.current.pauseVideo();
       } else {
         playerRef.current.playVideo();
+        setNeedsInteraction(false);
       }
     }
   };
 
-  if (!videoId) {
+  const handleClickToPlay = () => {
+    setNeedsInteraction(false);
+    if (playerRef.current) {
+      playerRef.current.playVideo();
+    }
+  };
+
+  const handleRetry = () => {
+    setHasError(false);
+    setErrorMessage('');
+    setRetryCount(0);
+    // Trigger re-render by resetting
+    if (playerRef.current) {
+      playerRef.current.loadVideoById(videoId);
+    }
+  };
+
+  if (!videoId && !playlistId) {
     return (
       <div className="glass p-4 flex items-center gap-4">
         <div className="w-12 h-12 rounded-full bg-[var(--warm-brown)]/20 flex items-center justify-center">
           <Music2 className="w-6 h-6 text-[var(--warm-brown)]/50" />
         </div>
         <p className="text-sm text-[var(--warm-brown)]/60">
-          Use the command bar to set the mood...
+          Nhấn ⌘K hoặc click "Set the mood..." để chọn nhạc
         </p>
       </div>
     );
+  }
+
+  // Get YouTube player options
+  const playerOpts: any = {
+    height: '0',
+    width: '0',
+    playerVars: {
+      autoplay: 1,
+      loop: 1,
+      controls: 0,
+      disablekb: 1,
+      modestbranding: 1,
+      rel: 0,
+    },
+  };
+
+  // Add playlist support
+  if (playlistId) {
+    playerOpts.playerVars.list = playlistId;
+    playerOpts.playerVars.listType = 'playlist';
+    playerOpts.playerVars.shuffle = 1;
+  } else if (videoId) {
+    playerOpts.playerVars.playlist = videoId; // For looping single video
   }
 
   return (
@@ -90,20 +184,58 @@ export function VinylPlayer() {
       {/* Hidden YouTube player */}
       <div className="hidden">
         <YouTube
-          videoId={videoId}
-          opts={{
-            height: '0',
-            width: '0',
-            playerVars: {
-              autoplay: 1,
-              loop: 1,
-              playlist: videoId,
-            },
-          }}
+          videoId={playlistId ? undefined : videoId || undefined}
+          opts={playerOpts}
           onReady={onReady}
           onStateChange={onStateChange}
+          onError={onError}
         />
       </div>
+
+      {/* Error State */}
+      <AnimatePresence>
+        {hasError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <p className="text-sm text-red-400 flex-1">{errorMessage}</p>
+            <button
+              onClick={handleRetry}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+            >
+              <RefreshCw className="w-4 h-4 text-red-400" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Click to Play Overlay */}
+      <AnimatePresence>
+        {needsInteraction && !hasError && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="mb-3"
+          >
+            <motion.button
+              className="w-full py-3 rounded-xl bg-[var(--sage-green)] text-white font-medium flex items-center justify-center gap-2 hover:bg-[var(--sage-green)]/90 transition-all cursor-pointer"
+              onClick={handleClickToPlay}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Play className="w-5 h-5" fill="currentColor" />
+              Click để phát nhạc
+            </motion.button>
+            <p className="text-xs text-center text-[var(--warm-brown)]/50 mt-2">
+              Trình duyệt yêu cầu click để phát audio
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Vinyl UI */}
       <div className="flex items-center gap-4">
@@ -147,7 +279,7 @@ export function VinylPlayer() {
             {musicMood || 'Now Playing'}
           </p>
           <p className="text-sm text-[var(--warm-brown)]/60 truncate">
-            Lo-fi vibes ∙ {isPlaying ? 'Playing' : 'Paused'}
+            {playlistId ? 'Playlist' : 'Video'} ∙ {isPlaying ? 'Đang phát' : 'Tạm dừng'}
           </p>
         </div>
 
@@ -202,3 +334,4 @@ export function VinylPlayer() {
     </div>
   );
 }
+

@@ -140,6 +140,7 @@ interface CapyFlowState {
   // Music State
   musicMood: string;
   videoId: string | null;
+  playlistId: string | null;
   volume: number;
   isMuted: boolean;
   isPlaying: boolean;
@@ -217,6 +218,7 @@ interface CapyFlowState {
 
   setMusicMood: (mood: string) => void;
   setVideoId: (id: string | null) => void;
+  setPlaylistId: (id: string | null) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
   setIsPlaying: (playing: boolean) => void;
@@ -297,6 +299,7 @@ export const useStore = create<CapyFlowState>()(
       // Initial Music State
       musicMood: '',
       videoId: null,
+      playlistId: null,
       volume: 0.7,
       isMuted: false,
       isPlaying: false,
@@ -466,6 +469,7 @@ export const useStore = create<CapyFlowState>()(
       // Music Actions
       setMusicMood: (mood) => set({ musicMood: mood }),
       setVideoId: (id) => set({ videoId: id }),
+      setPlaylistId: (id) => set({ playlistId: id }),
       setVolume: (volume) => set({ volume: Math.max(0, Math.min(1, volume)) }),
       toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
       setIsPlaying: (playing) => set({ isPlaying: playing }),
