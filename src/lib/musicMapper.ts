@@ -211,6 +211,88 @@ export const MUSIC_MAPPINGS: MusicMapping[] = [
     description: 'Pure white noise for deep focus',
     emoji: '📻',
   },
+
+  // === CLASSICAL & MOZART (NEW) ===
+  {
+    keywords: ['mozart', 'nhạc mozart', 'mozart study', 'thiên tài'],
+    mood: 'Mozart Study',
+    videoId: 'zzXGMKRJVK4', // Mozart for studying
+    backupVideoIds: ['Rb0UmrCXxVA', 'o3ByOuJi_mE'],
+    description: 'Nhạc Mozart giúp tăng tập trung',
+    emoji: '🎻',
+  },
+  {
+    keywords: ['bach', 'baroque', 'nhạc bach'],
+    mood: 'Bach Baroque',
+    videoId: 'iNB2Smjb6ow', // Bach study music
+    backupVideoIds: ['_JaTLSPxOmk', 'ZKvhkcJFDLY'],
+    description: 'Nhạc Bach kinh điển cho học tập',
+    emoji: '🎼',
+  },
+  {
+    keywords: ['beethoven', 'symphony', 'giao hưởng'],
+    mood: 'Beethoven Focus',
+    videoId: 'BV8cJGIm1oU', // Beethoven study
+    backupVideoIds: ['W-fFHeTX70Q', 'bVXrOgX9YVY'],
+    description: 'Giao hưởng Beethoven đầy cảm hứng',
+    emoji: '🎶',
+  },
+  {
+    keywords: ['classical peaceful', 'nhạc cổ điển', 'hòa tấu', 'orchestra'],
+    mood: 'Classical Peaceful',
+    videoId: 'jgpJVI3tDbY', // peaceful classical
+    backupVideoIds: ['F0nrTke9L7I', 'bVXrOgX9YVY'],
+    description: 'Nhạc cổ điển êm đềm cho tâm hồn',
+    emoji: '🏛️',
+  },
+  {
+    keywords: ['ambient', 'electronic ambient', 'atmospheric', 'space'],
+    mood: 'Ambient Electronic',
+    videoId: 'S_MOd40zlYU', // ambient electronic
+    backupVideoIds: ['LqJvGYB-SMA', 'w9gO032HYEM'],
+    description: 'Ambient tối giản, bay bổng',
+    emoji: '🛸',
+  },
+  {
+    keywords: ['cafe lofi', 'quán cà phê lofi', 'coffee shop', 'homework'],
+    mood: 'Cafe Lo-fi',
+    videoId: 'h2zkV-l_TbY', // cafe lofi
+    backupVideoIds: ['jfKfPfyJRdk', '5yx6BWlEVcY'],
+    description: 'Lo-fi chill trong quán cà phê',
+    emoji: '🧋',
+  },
+  {
+    keywords: ['pop instrumental', 'pop piano', 'top hits', 'cover'],
+    mood: 'Pop Instrumental',
+    videoId: 's86K-p089R8', // pop piano covers
+    backupVideoIds: ['HSOtku1j600', '4XJNeDj5d1U'],
+    description: 'Bản piano cover các hit nổi tiếng',
+    emoji: '🎤',
+  },
+  {
+    keywords: ['ghibli', 'studio ghibli', 'totoro', 'spirited away', 'howl'],
+    mood: 'Ghibli OST',
+    videoId: '3jWRrafhO7M', // Ghibli piano
+    backupVideoIds: ['7JJfJgyHYwU', 'zhJQk9Trvo4'],
+    description: 'Nhạc phim Ghibli thư giãn',
+    emoji: '🍂',
+  },
+  {
+    keywords: ['asmr', 'writing', 'viết bài', 'pencil', 'pen'],
+    mood: 'ASMR Writing',
+    videoId: 'SejVZsSf4ME', // ASMR study sounds
+    backupVideoIds: ['nMfPqeZjc2c', 'q76bMs-NwRk'],
+    description: 'Tiếng viết bài, tiếng mưa nhẹ',
+    emoji: '✍️',
+  },
+  {
+    keywords: ['binaural', 'alpha waves', 'brain waves', 'sóng não'],
+    mood: 'Binaural Focus',
+    videoId: 'WPni755-Krg', // binaural beats study
+    backupVideoIds: ['1ZYbU82GVz4', 'nMfPqeZjc2c'],
+    description: 'Sóng Alpha giúp tập trung sâu',
+    emoji: '🧠',
+  },
 ];
 
 // Fuzzy keyword matcher

@@ -301,6 +301,17 @@ body {
   padding-right: max(1rem, env(safe-area-inset-right, 0px));
 }
 
+/* Bottom Nav Clearance */
+.pb-nav {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 8px));
+}
+
+/* Smooth scroll for views */
+.overflow-y-auto {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Touch-Friendly Interactions (Replace :hover with :active) */
 .glass:active,
 .glass-strong:active,
@@ -367,50 +378,55 @@ select {
 /* Mobile-specific adjustments */
 @media (max-width: 639px) {
   /* Use dynamic viewport height for mobile */
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100dvh;
     height: -webkit-fill-available;
   }
-  
+
   /* Reduce glass border radius on mobile */
-  .glass, .glass-strong, .glass-dark {
+  .glass,
+  .glass-strong,
+  .glass-dark {
     border-radius: 16px;
   }
-  
+
   /* Compact modal on mobile */
   .modal-content {
     max-height: 85vh;
     max-height: 85dvh;
   }
-  
+
   /* Reduce animation intensity on mobile for performance */
   @media (prefers-reduced-motion: no-preference) {
     .animate-float {
       animation-duration: 4s;
     }
-    
+
     .animate-breathe {
       animation-duration: 5s;
     }
   }
-  
+
   /* Better text sizing on small screens */
   .font-display {
     letter-spacing: 0.03em;
   }
-  
+
   /* Ensure buttons don't get too small */
-  button, [role="button"] {
+  button,
+  [role="button"] {
     min-height: 36px;
     min-width: 36px;
   }
-  
+
   /* Range input styling for mobile */
   input[type="range"] {
     height: 24px;
     padding: 8px 0;
   }
-  
+
   input[type="range"]::-webkit-slider-thumb {
     width: 20px;
     height: 20px;
@@ -420,7 +436,7 @@ select {
     -webkit-appearance: none;
     margin-top: -8px;
   }
-  
+
   input[type="range"]::-moz-range-thumb {
     width: 20px;
     height: 20px;

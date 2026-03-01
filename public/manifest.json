@@ -1,0 +1,20 @@
+{
+  "name": "CapyFlow - Focus with Capy",
+  "short_name": "CapyFlow",
+  "description": "App học tập tập trung với Capybara dễ thương",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff8e7",
+  "theme_color": "#9CAF88",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%239CAF88'/><text x='50%25' y='50%25' text-anchor='middle' dy='.35em' font-size='320'>🦫</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "vi"
+}
