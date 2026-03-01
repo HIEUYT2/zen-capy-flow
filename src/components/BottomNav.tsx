@@ -3,10 +3,10 @@ import { Home, Brain, BarChart3, Settings } from 'lucide-react';
 import { useStore, type ViewType } from '../store/useStore';
 
 const NAV_ITEMS: { view: ViewType; icon: typeof Home; label: string }[] = [
-  { view: 'dashboard', icon: Home, label: 'Home' },
+  { view: 'dashboard', icon: Home, label: 'Hôm nay' },
   { view: 'focus', icon: Brain, label: 'Focus' },
-  { view: 'stats', icon: BarChart3, label: 'Stats' },
-  { view: 'settings', icon: Settings, label: 'Settings' },
+  { view: 'stats', icon: BarChart3, label: 'Phân tích' },
+  { view: 'settings', icon: Settings, label: 'Cài đặt' },
 ];
 
 export function BottomNav() {
@@ -17,54 +17,46 @@ export function BottomNav() {
 
   return (
     <motion.nav
-      className="fixed bottom-0 left-0 right-0 z-50"
+      aria-label="Điều hướng chính"
+      className="fixed inset-x-0 z-50"
+      style={{ bottom: 'max(8px, env(safe-area-inset-bottom, 0px))' }}
       initial={{ y: 0 }}
-      animate={{ y: isImmersive ? 100 : 0 }}
-      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+      animate={{ y: isImmersive ? 120 : 0, opacity: isImmersive ? 0.4 : 1 }}
+      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
     >
-      {/* Frosted glass background */}
-      <div className="bg-white/70 dark:bg-[#1a1b2e]/80 backdrop-blur-xl border-t border-white/20 shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
-        <div
-          className="flex items-center justify-around px-2 mx-auto max-w-lg"
-          style={{
-            paddingBottom: 'max(8px, env(safe-area-inset-bottom, 8px))',
-            paddingTop: '6px',
-          }}
-        >
+      <div className="px-safe">
+        <div className="mx-auto max-w-xl rounded-[24px] border border-white/55 bg-white/78 p-1.5 shadow-[0_18px_38px_rgba(24,34,26,0.2)] backdrop-blur-xl">
+          <div className="relative grid grid-cols-4 gap-1">
           {NAV_ITEMS.map(({ view, icon: Icon, label }) => {
-            const isActive = currentView === view;
+            const isCurrent = currentView === view;
             return (
               <motion.button
                 key={view}
-                className={`
-                  relative flex flex-col items-center justify-center gap-0.5
-                  min-w-[64px] min-h-[48px] rounded-2xl px-3 py-1.5
-                  transition-colors duration-200 cursor-pointer
-                  ${isActive 
-                    ? 'text-[var(--sage-dark)]' 
-                    : 'text-[var(--warm-brown)]/50 active:text-[var(--warm-brown)]/70'
-                  }
-                `}
+                aria-current={isCurrent ? 'page' : undefined}
+                className={`relative flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-1 transition-colors ${
+                  isCurrent
+                    ? 'text-[var(--color-primary-600)]'
+                    : 'text-[var(--text-soft)] active:text-[var(--text-strong)]'
+                }`}
                 onClick={() => setCurrentView(view)}
                 whileTap={{ scale: 0.9 }}
               >
-                {/* Active indicator pill */}
-                {isActive && (
+                {isCurrent && (
                   <motion.div
-                    className="absolute inset-x-3 top-0 h-[3px] rounded-full bg-[var(--sage-green)]"
+                    className="absolute inset-0 rounded-[18px] bg-[var(--color-primary-100)]"
                     layoutId="nav-indicator"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
                   />
                 )}
 
                 <Icon
-                  className={`w-5 h-5 transition-all duration-200 ${
-                    isActive ? 'stroke-[2.5]' : 'stroke-[1.8]'
+                  className={`relative z-10 h-5 w-5 transition-all duration-200 ${
+                    isCurrent ? 'stroke-[2.4]' : 'stroke-[2]'
                   }`}
                 />
                 <span
-                  className={`text-[10px] leading-tight font-medium transition-all duration-200 ${
-                    isActive ? 'opacity-100' : 'opacity-60'
+                  className={`relative z-10 text-[10px] font-semibold leading-tight transition-all duration-200 ${
+                    isCurrent ? 'opacity-100' : 'opacity-75'
                   }`}
                 >
                   {label}
@@ -72,6 +64,7 @@ export function BottomNav() {
               </motion.button>
             );
           })}
+          </div>
         </div>
       </div>
     </motion.nav>

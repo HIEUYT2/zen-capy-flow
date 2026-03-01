@@ -46,7 +46,7 @@ export function DailyReview() {
       onClick={handleDismiss}
     >
       <motion.div
-        className="w-full max-w-md mx-4 mb-4 sm:mb-0 glass-strong p-5 sm:p-6 overflow-hidden"
+        className="w-full max-w-md mx-4 mb-4 sm:mb-0 rounded-3xl border border-white/70 bg-white/85 p-5 sm:p-6 overflow-hidden shadow-[0_18px_42px_rgba(20,28,25,0.24)]"
         initial={{ y: 100, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 100, opacity: 0 }}
@@ -55,10 +55,10 @@ export function DailyReview() {
       >
         {/* Close */}
         <button
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors cursor-pointer"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/60 flex items-center justify-center hover:bg-white/80 transition-colors cursor-pointer"
           onClick={handleDismiss}
         >
-          <X className="w-4 h-4 text-[var(--warm-brown)]" />
+          <X className="w-4 h-4 text-[var(--text-soft)]" />
         </button>
 
         {/* Header */}
@@ -67,6 +67,7 @@ export function DailyReview() {
           <h2 className="text-lg font-display text-[var(--warm-brown-dark)]">
             Tổng kết hôm nay
           </h2>
+          <p className="text-sm text-[var(--text-soft)] mt-1">Hôm nay ổn chứ?</p>
           <p className="text-xs text-[var(--warm-brown)]/50 mt-1">
             {new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
@@ -130,7 +131,7 @@ export function DailyReview() {
 
         {/* Done button */}
         <motion.button
-          className="w-full py-3 rounded-2xl bg-gradient-to-r from-[var(--sage-green)] to-[var(--soft-blue)] text-white font-medium text-sm cursor-pointer"
+          className="w-full py-3 rounded-2xl bg-gradient-to-r from-[var(--color-primary-600)] to-[var(--color-accent-500)] text-white font-medium text-sm cursor-pointer"
           onClick={handleDismiss}
           whileTap={{ scale: 0.98 }}
         >

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
 import { useStore } from '../store/useStore';
@@ -23,6 +23,7 @@ export function FocusTimer() {
   } = useStore();
 
   const intervalRef = useRef<number | null>(null);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
 
   // Timer tick effect
   useEffect(() => {
@@ -43,6 +44,14 @@ export function FocusTimer() {
     };
   }, [isActive, isPaused, tick]);
 
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 639px)');
+    const handleChange = () => setIsMobile(media.matches);
+    handleChange();
+    media.addEventListener('change', handleChange);
+    return () => media.removeEventListener('change', handleChange);
+  }, []);
+
   // Check for completion
   useEffect(() => {
     if (timeRemaining === 0 && isActive) {
@@ -61,10 +70,8 @@ export function FocusTimer() {
   const totalDuration = sessionType === 'focus' ? focusDuration * 60 : breakDuration * 60;
   const progress = ((totalDuration - timeRemaining) / totalDuration) * 100;
 
-  // Circle SVG dimensions - responsive
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-  const size = isMobile ? 200 : 280;
-  const strokeWidth = isMobile ? 6 : 8;
+  const size = isMobile ? 224 : 286;
+  const strokeWidth = isMobile ? 7 : 8;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
@@ -80,14 +87,14 @@ export function FocusTimer() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full">
+    <div className="flex w-full flex-col items-center gap-5">
       {/* Session Type Toggle */}
-      <div className="glass flex p-1 gap-1">
+      <div className="grid w-full grid-cols-2 gap-1 rounded-2xl border border-white/65 bg-white/60 p-1">
         <motion.button
-          className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
             sessionType === 'focus'
-              ? 'bg-[var(--sage-green)] text-white shadow-sm'
-              : 'text-[var(--warm-brown)] hover:bg-white/20 active:bg-white/30'
+              ? 'bg-[var(--color-primary-600)] text-white shadow-sm'
+              : 'text-[var(--text-soft)] hover:bg-white/45 active:bg-white/60'
           }`}
           onClick={() => setSessionType('focus')}
           whileTap={{ scale: 0.95 }}
@@ -97,10 +104,10 @@ export function FocusTimer() {
           Focus
         </motion.button>
         <motion.button
-          className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
             sessionType === 'break'
-              ? 'bg-[var(--soft-blue)] text-white shadow-sm'
-              : 'text-[var(--warm-brown)] hover:bg-white/20 active:bg-white/30'
+              ? 'bg-[var(--color-accent-500)] text-white shadow-sm'
+              : 'text-[var(--text-soft)] hover:bg-white/45 active:bg-white/60'
           }`}
           onClick={() => setSessionType('break')}
           whileTap={{ scale: 0.95 }}
@@ -113,9 +120,9 @@ export function FocusTimer() {
 
       {/* Time Presets (only when not active) */}
       {!isActive && (
-        <div className="w-full space-y-2 sm:space-y-3">
+        <div className="w-full space-y-2.5">
           {/* Quick Presets */}
-          <div className="flex justify-center gap-1.5 sm:gap-2">
+          <div className="grid grid-cols-3 gap-1.5">
             {[
               { focus: 25, break: 5, label: '25/5' },
               { focus: 50, break: 10, label: '50/10' },
@@ -123,10 +130,10 @@ export function FocusTimer() {
             ].map((preset) => (
               <motion.button
                 key={preset.label}
-                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
+                className={`rounded-xl px-2 py-2 text-xs font-medium transition-colors sm:text-sm ${
                   focusDuration === preset.focus && breakDuration === preset.break
-                    ? 'bg-[var(--sage-green)] text-white'
-                    : 'glass text-[var(--warm-brown)] active:bg-white/30'
+                    ? 'bg-[var(--color-primary-600)] text-white'
+                    : 'bg-white/65 text-[var(--text-soft)] active:bg-white/80'
                 }`}
                 onClick={() => {
                   setFocusDuration(preset.focus);
@@ -140,8 +147,8 @@ export function FocusTimer() {
           </div>
 
           {/* Custom Slider */}
-          <div className="glass p-2 sm:p-3 space-y-1.5 sm:space-y-2">
-            <div className="flex justify-between text-xs text-[var(--warm-brown)]/70">
+          <div className="rounded-2xl border border-white/65 bg-white/55 p-3">
+            <div className="flex justify-between text-xs text-[var(--text-soft)]">
               <span>Focus: {focusDuration} min</span>
               <span>Break: {breakDuration} min</span>
             </div>
@@ -157,9 +164,9 @@ export function FocusTimer() {
                 // Auto-adjust break time (roughly 1/5 of focus)
                 setBreakDuration(Math.max(5, Math.round(newFocus / 5)));
               }}
-              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[var(--sage-green)]"
+              className="mt-2 w-full cursor-pointer appearance-none rounded-lg accent-[var(--color-primary-600)]"
             />
-            <div className="flex justify-between text-[10px] text-[var(--warm-brown)]/50">
+            <div className="mt-1 flex justify-between text-[10px] text-[var(--text-soft)]">
               <span>5m</span>
               <span>60m</span>
               <span>120m</span>
@@ -187,7 +194,7 @@ export function FocusTimer() {
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke={sessionType === 'focus' ? 'var(--sage-green)' : 'var(--soft-blue)'}
+            stroke={sessionType === 'focus' ? 'var(--color-primary-600)' : 'var(--color-accent-500)'}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -203,7 +210,7 @@ export function FocusTimer() {
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke={sessionType === 'focus' ? 'var(--sage-green)' : 'var(--soft-blue)'}
+            stroke={sessionType === 'focus' ? 'var(--color-primary-600)' : 'var(--color-accent-500)'}
             strokeWidth={strokeWidth + 4}
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -216,7 +223,7 @@ export function FocusTimer() {
         {/* Timer display */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <motion.span
-            className="text-5xl sm:text-7xl font-display text-[var(--warm-brown-dark)] tabular-nums tracking-widest"
+            className="text-5xl font-display tabular-nums tracking-[0.05em] text-[var(--text-strong)] sm:text-7xl"
             key={timeRemaining}
             initial={{ scale: 1 }}
             animate={{ scale: timeRemaining <= 10 && isActive ? [1, 1.1, 1] : 1 }}
@@ -224,35 +231,37 @@ export function FocusTimer() {
           >
             {formatTime(timeRemaining)}
           </motion.span>
-          <span className="text-xs sm:text-sm text-[var(--warm-brown)]/70 mt-1 sm:mt-2 uppercase tracking-[0.15em] sm:tracking-[0.2em] font-medium">
+          <span className="mt-1 text-xs font-medium uppercase tracking-[0.16em] text-[var(--text-soft)] sm:mt-2 sm:text-sm sm:tracking-[0.2em]">
             {sessionType === 'focus' ? 'Focus Time' : 'Break Time'}
           </span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-3 sm:gap-6">
+      <div className="flex items-center gap-4 sm:gap-6">
         {/* Reset button */}
         <motion.button
-          className="glass w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center text-[var(--warm-brown)] hover:bg-white/20 transition-colors cursor-pointer"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/65 bg-white/58 text-[var(--text-soft)] transition-colors hover:bg-white/78 sm:h-14 sm:w-14"
           onClick={resetTimer}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          title="Reset Timer"
+          title="Reset timer"
+          aria-label="Đặt lại bộ đếm"
         >
           <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
         </motion.button>
 
         {/* Play/Pause button */}
         <motion.button
-          className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-white shadow-xl cursor-pointer transition-all ${
+          className={`flex h-16 w-16 items-center justify-center rounded-full text-white shadow-xl transition-all sm:h-20 sm:w-20 ${
             sessionType === 'focus'
-              ? 'bg-gradient-to-br from-[var(--sage-green)] to-[var(--sage-dark)] shadow-[var(--sage-green)]/30'
-              : 'bg-gradient-to-br from-[var(--soft-blue)] to-[var(--soft-blue-dark)] shadow-[var(--soft-blue)]/30'
+              ? 'bg-gradient-to-br from-[var(--color-primary-500)] to-[var(--color-primary-600)] shadow-[var(--color-primary-600)]/35'
+              : 'bg-gradient-to-br from-[var(--color-accent-500)] to-[var(--soft-blue-dark)] shadow-[var(--color-accent-500)]/35'
           }`}
           onClick={handlePlayPause}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          aria-label={!isActive || isPaused ? 'Bắt đầu hoặc tiếp tục phiên học' : 'Tạm dừng phiên học'}
         >
           {!isActive || isPaused ? (
             <Play className="w-6 h-6 sm:w-8 sm:h-8 ml-1" fill="currentColor" />
@@ -266,8 +275,8 @@ export function FocusTimer() {
       </div>
 
       {/* Duration info */}
-      <p className="text-sm text-[var(--warm-brown)]/60 font-medium tracking-wide">
-        {sessionType === 'focus' ? `${focusDuration} min session` : `${breakDuration} min break`}
+      <p className="text-sm font-medium tracking-wide text-[var(--text-soft)]">
+        {sessionType === 'focus' ? `${focusDuration} phút tập trung` : `${breakDuration} phút nghỉ`}
       </p>
     </div>
   );

@@ -10,18 +10,17 @@ export function CastButton() {
   return (
     <motion.button
       className={`
-        relative overflow-hidden px-6 py-3 rounded-2xl font-medium
-        flex items-center justify-center gap-3 w-full cursor-pointer
+        relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl px-5 py-3 text-sm font-semibold
         transition-all duration-300
         ${isDisabled 
-          ? 'bg-gray-400/30 text-gray-500 cursor-not-allowed' 
-          : 'bg-gradient-to-r from-[var(--soft-blue)] via-[var(--soft-blue-light)] to-[var(--sage-green)] text-white shadow-lg hover:shadow-xl'
+          ? 'cursor-not-allowed bg-slate-300/45 text-slate-500' 
+          : 'bg-gradient-to-r from-[var(--color-accent-500)] via-[var(--soft-blue-light)] to-[var(--color-primary-500)] text-white shadow-[0_12px_28px_rgba(70,118,157,0.3)]'
         }
       `}
       onClick={() => !isDisabled && startCasting()}
       disabled={isDisabled}
-      whileHover={!isDisabled ? { scale: 1.02, y: -2 } : {}}
       whileTap={!isDisabled ? { scale: 0.98 } : {}}
+      aria-label="Thả cần câu"
     >
       {/* Shimmer effect */}
       {!isDisabled && (
@@ -51,7 +50,7 @@ export function CastButton() {
       </motion.span>
       
       <span className="relative z-10">
-        {isCasting ? 'Casting...' : isLineBroken ? 'Line Broken!' : 'Cast Line'}
+        {isCasting ? 'Đang thả cần...' : isLineBroken ? 'Dây câu bị đứt' : 'Thả cần câu'}
       </span>
 
       {/* Ripple on cast */}

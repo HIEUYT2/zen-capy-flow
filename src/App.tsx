@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Background } from './components/Background';
 import { RainCanvas } from './components/RainCanvas';
+import { AppHeader } from './components/AppHeader';
 import { BottomNav } from './components/BottomNav';
 import { Toast } from './components/Toast';
 import { FishCaughtModal } from './components/FishCaughtModal';
@@ -22,7 +23,7 @@ import { useStore } from './store/useStore';
 import './index.css';
 
 function App() {
-  // Initialize all hooks
+  // Initialize global app hooks
   useTabVisibility();
   useAutoTheme();
   useSoundEffects();
@@ -33,42 +34,26 @@ function App() {
   const { currentView, isTabActive, isMiniMode } = useStore();
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative h-dvh w-full overflow-hidden">
       {/* Dynamic Background */}
       <Background />
       <RainCanvas />
 
-      {/* Watermark */}
-      {!isMiniMode && (
-        <div className="fixed top-2 left-1/2 transform -translate-x-1/2 z-50 font-display text-[8px] font-bold text-[var(--warm-brown)]/20 tracking-[0.2em] select-none pointer-events-none uppercase">
-          WEB CỦA THIÊN QUỐC
-        </div>
-      )}
-
-      {/* Main Content Area */}
+      {/* Main App Shell */}
       <motion.div
-        className="relative z-10 w-full h-full"
+        className="relative z-10 flex h-full w-full flex-col"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.45 }}
       >
-        {/* App Header - compact on mobile */}
-        <header className="flex items-center justify-between px-4 py-2 sm:py-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xl sm:text-2xl">🦫</span>
-            <h1 className="text-base sm:text-lg font-display text-[var(--warm-brown-dark)]">
-              CapyFlow
-            </h1>
-          </div>
-        </header>
+        <AppHeader />
 
-        {/* View Router */}
-        <div className="w-full" style={{ height: 'calc(100% - 48px)' }}>
+        <main className="relative flex-1 min-h-0">
           {currentView === 'dashboard' && <DashboardView />}
           {currentView === 'focus' && <FocusView />}
           {currentView === 'stats' && <StatsView />}
           {currentView === 'settings' && <SettingsView />}
-        </div>
+        </main>
       </motion.div>
 
       {/* Bottom Navigation */}
@@ -95,12 +80,13 @@ function App() {
       {/* Tab away indicator */}
       {!isTabActive && (
         <motion.div
-          className="fixed bottom-20 left-1/2 transform -translate-x-1/2 glass-strong px-5 py-2.5 flex items-center gap-2 z-40"
+          className="fixed left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-2xl border border-white/25 bg-white/75 px-4 py-2 shadow-[0_12px_30px_rgba(20,30,24,0.18)] backdrop-blur-xl"
+          style={{ bottom: 'calc(92px + env(safe-area-inset-bottom, 0px))' }}
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
           <span className="text-lg">👀</span>
-          <p className="text-sm text-[var(--warm-brown)]">
+          <p className="text-sm text-[var(--text-strong)]">
             Capy is watching... Stay focused!
           </p>
         </motion.div>

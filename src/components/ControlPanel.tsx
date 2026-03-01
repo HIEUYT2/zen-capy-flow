@@ -11,36 +11,35 @@ export function ControlPanel() {
   } = useStore();
 
   return (
-    <div className="glass p-3 sm:p-4 space-y-3">
+    <div className="space-y-3">
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        <div className="bg-white/10 rounded-xl p-2 sm:p-3 text-center">
-          <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-[var(--soft-blue)]">
-            <Fish className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="text-xl sm:text-2xl font-display">{fishCaughtCount}</span>
+      <div className="grid grid-cols-2 gap-2.5">
+        <div className="rounded-2xl border border-white/60 bg-white/55 p-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 text-[var(--color-accent-500)]">
+            <Fish className="h-4 w-4" />
+            <span className="text-2xl font-display">{fishCaughtCount}</span>
           </div>
-          <p className="text-[10px] sm:text-xs text-[var(--warm-brown)]/60 mt-0.5 sm:mt-1">Fish Caught</p>
+          <p className="mt-0.5 text-[10px] text-[var(--text-soft)]">Tổng cá câu được</p>
         </div>
-        <div className="bg-white/10 rounded-xl p-2 sm:p-3 text-center">
-          <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-[var(--sage-green)]">
-            <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="text-xl sm:text-2xl font-display">{currentStreak}</span>
+        <div className="rounded-2xl border border-white/60 bg-white/55 p-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 text-[var(--color-primary-600)]">
+            <Flame className="h-4 w-4" />
+            <span className="text-2xl font-display">{currentStreak}</span>
           </div>
-          <p className="text-[10px] sm:text-xs text-[var(--warm-brown)]/60 mt-0.5 sm:mt-1">Focus Streak</p>
+          <p className="mt-0.5 text-[10px] text-[var(--text-soft)]">Chuỗi tập trung</p>
         </div>
       </div>
 
       {/* Broken line repair */}
       {isLineBroken && (
         <motion.button
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-red-400 to-red-500 text-white font-medium flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 py-3 text-sm font-medium text-white"
           onClick={repairLine}
-          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          🔧 Repair Fishing Line
+          🔧 Sửa cần câu
         </motion.button>
       )}
     </div>

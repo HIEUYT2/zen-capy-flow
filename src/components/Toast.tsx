@@ -6,7 +6,12 @@ export function Toast() {
   const { toasts, removeToast } = useStore();
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90vw] max-w-sm pointer-events-none">
+    <div
+      className="pointer-events-none fixed left-1/2 z-[100] flex w-[92vw] max-w-sm -translate-x-1/2 flex-col gap-2"
+      style={{ top: 'calc(12px + env(safe-area-inset-top, 0px))' }}
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <AnimatePresence mode="popLayout">
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onDismiss={() => removeToast(toast.id)} />
@@ -35,11 +40,12 @@ function ToastItem({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -10, scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className="pointer-events-auto glass-strong px-4 py-3 flex items-center gap-3 cursor-pointer shadow-lg"
+      className="pointer-events-auto flex cursor-pointer items-center gap-3 rounded-2xl border border-white/65 bg-white/84 px-4 py-3 shadow-[0_16px_32px_rgba(30,40,32,0.2)] backdrop-blur-xl"
       onClick={onDismiss}
+      role="status"
     >
       {toast.emoji && <span className="text-xl shrink-0">{toast.emoji}</span>}
-      <p className="text-sm font-medium text-[var(--warm-brown-dark)] leading-snug">
+      <p className="text-sm font-medium leading-snug text-[var(--text-strong)]">
         {toast.message}
       </p>
     </motion.div>

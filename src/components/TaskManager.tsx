@@ -1,25 +1,42 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Check, Trash2, Flag, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Calendar, Check, ChevronDown, ChevronUp, Flag, Plus, Trash2 } from 'lucide-react';
 import { useStore, type Task, type TaskPriority } from '../store/useStore';
 
 const SUBJECT_COLORS: Record<string, string> = {
-  'Toán': '#6C8EBF',
-  'Lý': '#E8884F',
-  'Hóa': '#82B366',
-  'Văn': '#D4A0C0',
-  'Anh': '#E6B655',
-  'Sử': '#B07D62',
-  'Địa': '#7AA874',
-  'CNTT': '#7B68EE',
-  'Khác': '#9CA3AF',
+  Toán: '#7C9CC4',
+  Lý: '#E29A5F',
+  Hóa: '#78A876',
+  Văn: '#C88CB2',
+  Anh: '#D7AD4B',
+  Sử: '#AF7A5A',
+  Địa: '#6D9A6A',
+  CNTT: '#7E78D6',
+  Khác: '#8E98A8',
 };
 
-const PRIORITY_CONFIG: Record<TaskPriority, { color: string; label: string }> = {
-  high: { color: '#EF4444', label: 'Cao' },
-  medium: { color: '#F59E0B', label: 'Trung bình' },
-  low: { color: '#6B7280', label: 'Thấp' },
+const SUBJECT_OPTIONS = [
+  { label: 'Toán', value: 'Toán' },
+  { label: 'Lý', value: 'Lý' },
+  { label: 'Hóa', value: 'Hóa' },
+  { label: 'Văn', value: 'Văn' },
+  { label: 'Anh', value: 'Anh' },
+  { label: 'Sử', value: 'Sử' },
+  { label: 'Địa', value: 'Địa' },
+  { label: 'CNTT', value: 'CNTT' },
+  { label: 'Khác', value: 'Khác' },
+];
+
+const PRIORITY_CONFIG: Record<TaskPriority, { color: string; label: string; order: number }> = {
+  high: { color: '#E5484D', label: 'Cao', order: 1 },
+  medium: { color: '#D97706', label: 'TB', order: 2 },
+  low: { color: '#64748B', label: 'Thấp', order: 3 },
 };
+
+function parseDate(value: string) {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
 
 function AddTaskForm({ onClose }: { onClose: () => void }) {
   const { addTask } = useStore();
@@ -27,6 +44,8 @@ function AddTaskForm({ onClose }: { onClose: () => void }) {
   const [subject, setSubject] = useState('Khác');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [dueDate, setDueDate] = useState('');
+
+  const today = new Date().toISOString().split('T')[0];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,99 +57,83 @@ function AddTaskForm({ onClose }: { onClose: () => void }) {
       dueDate: dueDate || undefined,
     });
     setTitle('');
+    setDueDate('');
     onClose();
   };
 
   return (
     <motion.form
+      className="overflow-hidden"
+      onSubmit={handleSubmit}
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: 'auto' }}
       exit={{ opacity: 0, height: 0 }}
-      className="overflow-hidden"
-      onSubmit={handleSubmit}
     >
-      <div className="glass p-3 space-y-3 mt-2">
-        {/* Title */}
+      <div className="mt-2 rounded-2xl border border-white/60 bg-white/55 p-3.5 space-y-3">
         <input
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Tên công việc..."
-          className="w-full px-3 py-2.5 bg-white/30 rounded-xl border border-white/20 text-sm
-            text-[var(--warm-brown-dark)] placeholder:text-[var(--warm-brown)]/40
-            focus:outline-none focus:ring-2 focus:ring-[var(--sage-green)]/50"
+          onChange={(event) => setTitle(event.target.value)}
+          placeholder="Ví dụ: Ôn chương 4 đại số"
+          className="input-shell w-full text-sm"
+          maxLength={90}
           autoFocus
+          aria-label="Tên công việc"
         />
 
-        {/* Subject tags */}
         <div className="flex flex-wrap gap-1.5">
-          {Object.entries(SUBJECT_COLORS).map(([name, color]) => (
+          {SUBJECT_OPTIONS.map((item) => (
             <button
-              key={name}
+              key={item.value}
               type="button"
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                subject === name
-                  ? 'text-white shadow-sm scale-105'
-                  : 'text-[var(--warm-brown)] bg-white/20 hover:bg-white/30'
+              className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
+                subject === item.value
+                  ? 'text-white shadow-sm'
+                  : 'bg-white/65 text-[var(--text-soft)]'
               }`}
-              style={subject === name ? { backgroundColor: color } : {}}
-              onClick={() => setSubject(name)}
+              style={subject === item.value ? { backgroundColor: SUBJECT_COLORS[item.value] } : undefined}
+              onClick={() => setSubject(item.value)}
             >
-              {name}
+              {item.label}
             </button>
           ))}
         </div>
 
-        {/* Priority & Due date row */}
-        <div className="flex gap-2">
-          <div className="flex gap-1 flex-1">
-            {(Object.keys(PRIORITY_CONFIG) as TaskPriority[]).map((p) => (
-              <button
-                key={p}
-                type="button"
-                className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-                  priority === p
-                    ? 'text-white shadow-sm'
-                    : 'bg-white/15 text-[var(--warm-brown)]/70'
-                }`}
-                style={priority === p ? { backgroundColor: PRIORITY_CONFIG[p].color } : {}}
-                onClick={() => setPriority(p)}
-              >
-                <Flag className="w-3 h-3" />
-                {PRIORITY_CONFIG[p].label}
-              </button>
-            ))}
-          </div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {(Object.keys(PRIORITY_CONFIG) as TaskPriority[]).map((level) => (
+            <button
+              key={level}
+              type="button"
+              className={`rounded-lg px-2 py-2 text-xs font-medium ${
+                priority === level ? 'text-white' : 'bg-white/65 text-[var(--text-soft)]'
+              }`}
+              style={priority === level ? { backgroundColor: PRIORITY_CONFIG[level].color } : undefined}
+              onClick={() => setPriority(level)}
+            >
+              <Flag className="mr-1 inline h-3 w-3" />
+              {PRIORITY_CONFIG[level].label}
+            </button>
+          ))}
         </div>
 
-        {/* Due date */}
-        <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-[var(--warm-brown)]/60" />
+        <label className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-[var(--text-soft)]" />
           <input
             type="date"
+            min={today}
             value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="flex-1 px-3 py-2 bg-white/20 rounded-xl border border-white/10 text-xs
-              text-[var(--warm-brown-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--sage-green)]/50"
+            onChange={(event) => setDueDate(event.target.value)}
+            className="input-shell w-full text-xs"
+            aria-label="Hạn chót"
           />
-        </div>
+        </label>
 
-        {/* Actions */}
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl bg-white/15 text-sm font-medium text-[var(--warm-brown)]/70 cursor-pointer active:scale-95 transition-transform"
-          >
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" className="btn-soft px-3 py-2.5 text-sm" onClick={onClose}>
             Hủy
           </button>
-          <button
-            type="submit"
-            disabled={!title.trim()}
-            className="flex-1 py-2.5 rounded-xl bg-[var(--sage-green)] text-white text-sm font-medium cursor-pointer 
-              active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Thêm
+          <button type="submit" className="btn-primary px-3 py-2.5 text-sm disabled:opacity-45" disabled={!title.trim()}>
+            Lưu task
           </button>
         </div>
       </div>
@@ -140,156 +143,153 @@ function AddTaskForm({ onClose }: { onClose: () => void }) {
 
 function TaskItem({ task }: { task: Task }) {
   const { toggleTask, deleteTask } = useStore();
-  const isOverdue = task.dueDate && !task.completed && new Date(task.dueDate) < new Date();
-  const subjectColor = SUBJECT_COLORS[task.subject] || SUBJECT_COLORS['Khác'];
+  const isOverdue =
+    task.dueDate ? parseDate(task.dueDate) < new Date(new Date().toDateString()) && !task.completed : false;
+  const subjectColor = SUBJECT_COLORS[task.subject] ?? SUBJECT_COLORS.Khác;
+  const priority = PRIORITY_CONFIG[task.priority];
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 10, height: 0 }}
-      className={`flex items-center gap-3 p-3 rounded-2xl transition-all ${
-        task.completed ? 'bg-white/5 opacity-60' : 'bg-white/15'
+      className={`flex items-start gap-3 rounded-2xl border px-3 py-2.5 ${
+        task.completed ? 'border-white/50 bg-white/35 opacity-70' : 'border-white/65 bg-white/55'
       }`}
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 8, height: 0 }}
     >
-      {/* Checkbox */}
-      <motion.button
-        className={`w-6 h-6 min-w-[24px] rounded-full border-2 flex items-center justify-center cursor-pointer transition-colors ${
+      <button
+        aria-label={task.completed ? 'Đánh dấu chưa hoàn thành' : 'Đánh dấu hoàn thành'}
+        className={`mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border-2 ${
           task.completed
-            ? 'bg-[var(--sage-green)] border-[var(--sage-green)]'
-            : 'border-[var(--warm-brown)]/30 hover:border-[var(--sage-green)]'
+            ? 'border-[var(--color-primary-600)] bg-[var(--color-primary-600)] text-white'
+            : 'border-[var(--color-primary-500)]/55 text-transparent'
         }`}
         onClick={() => toggleTask(task.id)}
-        whileTap={{ scale: 0.8 }}
       >
-        {task.completed && <Check className="w-3.5 h-3.5 text-white" />}
-      </motion.button>
+        <Check className="h-3.5 w-3.5" />
+      </button>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <p
-          className={`text-sm font-medium leading-snug ${
-            task.completed
-              ? 'line-through text-[var(--warm-brown)]/40'
-              : 'text-[var(--warm-brown-dark)]'
-          }`}
-        >
+      <div className="min-w-0 flex-1">
+        <p className={`text-sm font-medium leading-snug ${task.completed ? 'line-through text-[var(--text-soft)]' : 'text-[var(--text-strong)]'}`}>
           {task.title}
         </p>
-        <div className="flex items-center gap-2 mt-1">
-          <span
-            className="text-[10px] px-1.5 py-0.5 rounded-md text-white font-medium"
-            style={{ backgroundColor: subjectColor }}
-          >
-            {task.subject}
+        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+          <span className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white" style={{ backgroundColor: subjectColor }}>
+            {SUBJECT_OPTIONS.find((item) => item.value === task.subject)?.label ?? 'Khác'}
           </span>
           {task.dueDate && (
-            <span
-              className={`text-[10px] ${
-                isOverdue ? 'text-red-400 font-semibold' : 'text-[var(--warm-brown)]/50'
-              }`}
-            >
-              {isOverdue ? '⚠️ ' : ''}
-              {new Date(task.dueDate).toLocaleDateString('vi-VN', {
-                day: 'numeric',
-                month: 'short',
-              })}
+            <span className={`text-[10px] ${isOverdue ? 'font-semibold text-rose-600' : 'text-[var(--text-soft)]'}`}>
+              {isOverdue ? 'Quá hạn' : 'Đến hạn'} {parseDate(task.dueDate).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' })}
             </span>
           )}
-          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: PRIORITY_CONFIG[task.priority].color }} />
+          <span className={`text-[10px] font-semibold ${priority.color}`}>Ưu tiên {priority.label}</span>
         </div>
       </div>
 
-      {/* Delete */}
-      <motion.button
-        className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--warm-brown)]/30 hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+      <button
+        aria-label="Xóa công việc"
+        className="inline-flex h-8 w-8 items-center justify-center rounded-xl text-[var(--text-soft)] hover:bg-rose-100 hover:text-rose-600"
         onClick={() => deleteTask(task.id)}
-        whileTap={{ scale: 0.85 }}
       >
-        <Trash2 className="w-3.5 h-3.5" />
-      </motion.button>
+        <Trash2 className="h-4 w-4" />
+      </button>
     </motion.div>
   );
 }
 
+function sortTasks(a: Task, b: Task) {
+  if (a.dueDate && b.dueDate) {
+    const dueDiff = parseDate(a.dueDate).getTime() - parseDate(b.dueDate).getTime();
+    if (dueDiff !== 0) return dueDiff;
+  } else if (a.dueDate && !b.dueDate) {
+    return -1;
+  } else if (!a.dueDate && b.dueDate) {
+    return 1;
+  }
+
+  const priorityDiff = PRIORITY_CONFIG[a.priority].order - PRIORITY_CONFIG[b.priority].order;
+  if (priorityDiff !== 0) return priorityDiff;
+
+  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+}
+
 interface TaskManagerProps {
-  compact?: boolean; // For dashboard preview
+  compact?: boolean;
 }
 
 export function TaskManager({ compact = false }: TaskManagerProps) {
   const { tasks } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [expandCompact, setExpandCompact] = useState(false);
 
-  const activeTasks = tasks.filter((t) => !t.completed);
-  const completedTasks = tasks.filter((t) => t.completed);
-  const displayTasks = compact ? activeTasks.slice(0, 3) : activeTasks;
+  const activeTasks = useMemo(() => tasks.filter((task) => !task.completed).slice().sort(sortTasks), [tasks]);
+  const completedTasks = useMemo(() => tasks.filter((task) => task.completed).slice().sort(sortTasks), [tasks]);
+  const visibleTasks = compact && !expandCompact ? activeTasks.slice(0, 3) : activeTasks;
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-display text-[var(--warm-brown-dark)] tracking-wide">
-          📋 Công việc {activeTasks.length > 0 && (
-            <span className="text-[var(--warm-brown)]/50 font-normal">({activeTasks.length})</span>
-          )}
-        </h3>
-        <motion.button
-          className="w-8 h-8 rounded-xl bg-[var(--sage-green)]/20 flex items-center justify-center text-[var(--sage-green)] cursor-pointer"
-          onClick={() => setShowForm(!showForm)}
-          whileTap={{ scale: 0.9 }}
-          animate={{ rotate: showForm ? 45 : 0 }}
+    <section>
+      <header className="mb-3 flex items-center justify-between">
+        <div>
+          <h3 className="font-display text-sm text-[var(--text-strong)]">Task học tập</h3>
+          <p className="text-xs text-[var(--text-soft)]">{activeTasks.length} task chưa hoàn thành</p>
+        </div>
+        <button
+          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-primary-100)] text-[var(--color-primary-600)]"
+          onClick={() => setShowForm((prev) => !prev)}
+          aria-label={showForm ? 'Đóng form thêm task' : 'Mở form thêm task'}
         >
-          <Plus className="w-4 h-4" />
-        </motion.button>
-      </div>
+          <motion.span animate={{ rotate: showForm ? 45 : 0 }}>
+            <Plus className="h-4 w-4" />
+          </motion.span>
+        </button>
+      </header>
 
-      {/* Add form */}
       <AnimatePresence>{showForm && <AddTaskForm onClose={() => setShowForm(false)} />}</AnimatePresence>
 
-      {/* Task list */}
-      <div className="space-y-2 mt-2">
+      <div className="mt-2 space-y-2">
         <AnimatePresence mode="popLayout">
-          {displayTasks.length === 0 && !showForm && (
+          {visibleTasks.length === 0 && !showForm && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center text-sm text-[var(--warm-brown)]/40 py-4"
+              className="rounded-xl border border-dashed border-white/65 bg-white/45 py-4 text-center text-sm text-[var(--text-soft)]"
             >
-              Chưa có công việc nào 🎉
+              Chưa có task, thêm một việc để bắt đầu.
             </motion.p>
           )}
-          {displayTasks.map((task) => (
+          {visibleTasks.map((task) => (
             <TaskItem key={task.id} task={task} />
           ))}
         </AnimatePresence>
       </div>
 
-      {/* Compact mode "show all" link */}
       {compact && activeTasks.length > 3 && (
-        <p className="text-center text-xs text-[var(--sage-green)] font-medium mt-2 cursor-pointer">
-          Xem tất cả ({activeTasks.length}) →
-        </p>
+        <button
+          className="mt-2 text-xs font-semibold text-[var(--color-primary-600)]"
+          onClick={() => setExpandCompact((prev) => !prev)}
+        >
+          {expandCompact ? 'Thu gọn' : `Xem thêm ${activeTasks.length - 3} task`}
+        </button>
       )}
 
-      {/* Completed section (full mode only) */}
       {!compact && completedTasks.length > 0 && (
         <div className="mt-4">
           <button
-            className="flex items-center gap-1.5 text-xs text-[var(--warm-brown)]/50 font-medium cursor-pointer mb-2"
-            onClick={() => setShowCompleted(!showCompleted)}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-soft)]"
+            onClick={() => setShowCompleted((prev) => !prev)}
           >
-            {showCompleted ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            Đã xong ({completedTasks.length})
+            {showCompleted ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            Đã hoàn thành ({completedTasks.length})
           </button>
           <AnimatePresence>
             {showCompleted && (
               <motion.div
+                className="mt-2 space-y-2 overflow-hidden"
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="space-y-2 overflow-hidden"
               >
                 {completedTasks.map((task) => (
                   <TaskItem key={task.id} task={task} />
@@ -299,6 +299,6 @@ export function TaskManager({ compact = false }: TaskManagerProps) {
           </AnimatePresence>
         </div>
       )}
-    </div>
+    </section>
   );
 }

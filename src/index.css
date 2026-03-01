@@ -2,21 +2,21 @@
 @import "tailwindcss";
 
 :root {
-  /* CapyFlow Color Palette */
-  --sage-green: #9caf88;
-  --sage-light: #b8c9a9;
-  --sage-dark: #7a8f68;
-  --sand: #e8dcc4;
-  --sand-light: #f5efe0;
-  --sand-dark: #d4c5a9;
-  --soft-blue: #a7c7e7;
-  --soft-blue-light: #c8def5;
-  --soft-blue-dark: #7ba9d6;
-  --warm-brown: #8b7355;
-  --warm-brown-light: #a68f71;
-  --warm-brown-dark: #6b5540;
-  --cream: #fff8e7;
-  --cream-dark: #f0e6d0;
+  /* Palette */
+  --sage-green: #8ea97a;
+  --sage-light: #b4c6a8;
+  --sage-dark: #607a52;
+  --sand: #e9deca;
+  --sand-light: #f8f2e5;
+  --sand-dark: #cdbb98;
+  --soft-blue: #8fb6d8;
+  --soft-blue-light: #c7dcf0;
+  --soft-blue-dark: #5f8fb8;
+  --warm-brown: #7b654a;
+  --warm-brown-light: #9d8569;
+  --warm-brown-dark: #4f3d2d;
+  --cream: #fdf7ea;
+  --cream-dark: #f0e5cf;
 
   /* Night Theme Colors */
   --night-bg: #1a1b2e;
@@ -27,6 +27,23 @@
   --rainy-bg: #4a5568;
   --rainy-accent: #667788;
   --rainy-mist: rgba(200, 210, 220, 0.3);
+
+  /* Semantic tokens */
+  --color-primary-600: #6d8b5a;
+  --color-primary-500: #88a874;
+  --color-primary-100: #e5efdd;
+  --color-accent-500: #73a4cc;
+  --text-strong: #453628;
+  --text-soft: rgba(69, 54, 40, 0.68);
+  --surface-glass: rgba(255, 255, 255, 0.7);
+  --surface-soft: rgba(255, 255, 255, 0.52);
+  --surface-border: rgba(255, 255, 255, 0.55);
+  --shadow-soft: 0 10px 30px rgba(38, 45, 34, 0.12);
+  --shadow-deep: 0 18px 45px rgba(30, 36, 27, 0.18);
+  --radius-card: 22px;
+  --radius-chip: 14px;
+  --bottom-nav-height: 86px;
+  --app-max-width: 1160px;
 }
 
 * {
@@ -51,38 +68,38 @@ body {
     "Segoe UI",
     Roboto,
     sans-serif;
+  color: var(--text-strong);
+  background: var(--cream);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  letter-spacing: 0.025em; /* tracking-wide */
+  letter-spacing: 0.015em;
 }
 
 /* Glassmorphism Utilities */
 .glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(16px);
+  background: var(--surface-soft);
+  backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 24px;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .glass-dark {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(16, 20, 26, 0.45);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  border-radius: var(--radius-card);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--surface-glass);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-deep);
 }
 
 /* Custom Scrollbar */
@@ -107,7 +124,7 @@ body {
 
 /* Focus Ring */
 *:focus-visible {
-  outline: 2px solid var(--sage-green);
+  outline: 2px solid var(--color-primary-500);
   outline-offset: 2px;
 }
 
@@ -115,7 +132,102 @@ body {
 .font-display {
   font-family: "Outfit", "Inter", sans-serif;
   font-weight: 600;
-  letter-spacing: 0.05em; /* slightly wider for display */
+  letter-spacing: 0.03em;
+}
+
+/* App Shell */
+.app-header-card {
+  margin: 0 auto;
+  width: 100%;
+  max-width: min(var(--app-max-width), 100%);
+  border: 1px solid var(--surface-border);
+  border-radius: calc(var(--radius-card) + 2px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.84) 0%,
+    rgba(255, 248, 236, 0.74) 60%,
+    rgba(243, 249, 255, 0.7) 100%
+  );
+  box-shadow: var(--shadow-soft);
+  padding: 0.85rem;
+}
+
+.header-chip {
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: var(--radius-chip);
+  background: rgba(255, 255, 255, 0.62);
+  min-height: 3rem;
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-card {
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+}
+
+.panel-section {
+  width: 100%;
+  max-width: min(var(--app-max-width), 100%);
+  margin: 0 auto;
+}
+
+.chip-muted {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  color: var(--text-soft);
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 0.45rem 0.65rem;
+}
+
+.btn-primary {
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 12px 26px rgba(107, 138, 82, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-soft {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--text-strong);
+  font-weight: 500;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.input-shell {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-strong);
+  min-height: 44px;
+  padding: 0.625rem 0.75rem;
+}
+
+.input-shell::placeholder {
+  color: rgba(79, 61, 45, 0.5);
+}
+
+.skeleton-block {
+  border-radius: 14px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.75) 40%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite linear;
 }
 
 /* Animations */
@@ -289,21 +401,21 @@ body {
 
 /* Safe Area Padding Utilities */
 .pt-safe {
-  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
 }
 
 .pb-safe {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
 
 .px-safe {
-  padding-left: max(1rem, env(safe-area-inset-left, 0px));
-  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  padding-left: max(0.9rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.9rem, env(safe-area-inset-right, 0px));
 }
 
 /* Bottom Nav Clearance */
 .pb-nav {
-  padding-bottom: calc(64px + env(safe-area-inset-bottom, 8px));
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 8px));
 }
 
 /* Smooth scroll for views */
@@ -344,11 +456,10 @@ button:active,
 /* Minimum touch target size (44x44px recommended by Apple) */
 button,
 [role="button"],
-a,
 input[type="checkbox"],
 input[type="radio"] {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 40px;
+  min-width: 40px;
 }
 
 /* System Dark Mode Detection */
@@ -417,8 +528,8 @@ select {
   /* Ensure buttons don't get too small */
   button,
   [role="button"] {
-    min-height: 36px;
-    min-width: 36px;
+    min-height: 40px;
+    min-width: 40px;
   }
 
   /* Range input styling for mobile */

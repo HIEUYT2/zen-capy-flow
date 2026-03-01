@@ -1,257 +1,312 @@
+import { useEffect, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Sun, CloudRain, Moon, Clock, Sparkles, Volume2, VolumeX,
-  Maximize, Minimize, Bell, Target, Info
+  Bell,
+  CloudRain,
+  Download,
+  Maximize,
+  Minimize,
+  Moon,
+  Sparkles,
+  Sun,
+  Target,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
-import { useStore, ACCESSORY_REWARDS, type Theme } from '../store/useStore';
+import { ACCESSORY_REWARDS, useStore, type Theme } from '../store/useStore';
 
-// Toggle Switch Component
-function ToggleSwitch({
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+}
+
+function ToggleRow({
   enabled,
-  onChange,
   label,
-  icon,
   description,
+  icon,
+  onToggle,
 }: {
   enabled: boolean;
-  onChange: () => void;
   label: string;
-  icon: React.ReactNode;
-  description?: string;
+  description: string;
+  icon: ReactNode;
+  onToggle: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between py-1">
-      <div className="flex items-center gap-2.5 flex-1 min-w-0">
-        <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0 text-[var(--warm-brown)]">
-          {icon}
+    <div className="rounded-2xl border border-white/60 bg-white/55 px-3 py-2.5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/70 text-[var(--text-soft)]">
+            {icon}
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-[var(--text-strong)]">{label}</p>
+            <p className="text-[11px] text-[var(--text-soft)]">{description}</p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <span className="text-sm font-medium text-[var(--warm-brown-dark)] block">{label}</span>
-          {description && (
-            <span className="text-[10px] text-[var(--warm-brown)]/40 block mt-0.5 leading-tight">{description}</span>
-          )}
-        </div>
+        <button
+          role="switch"
+          aria-checked={enabled}
+          onClick={onToggle}
+          className={`relative h-7 w-12 rounded-full p-1 transition-colors ${
+            enabled ? 'bg-[var(--color-primary-500)]' : 'bg-slate-300'
+          }`}
+        >
+          <motion.span
+            className="block h-5 w-5 rounded-full bg-white shadow-sm"
+            animate={{ x: enabled ? 20 : 0 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+          />
+        </button>
       </div>
-      <motion.button
-        className={`
-          relative w-12 h-7 rounded-full cursor-pointer transition-colors duration-300 shrink-0 ml-3
-          ${enabled
-            ? 'bg-gradient-to-r from-[var(--sage-green)] to-[var(--soft-blue)]'
-            : 'bg-white/20'
-          }
-        `}
-        onClick={onChange}
-        whileTap={{ scale: 0.95 }}
-      >
-        <motion.div
-          className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-md"
-          animate={{ left: enabled ? 26 : 4 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        />
-      </motion.button>
     </div>
   );
 }
 
-const themeConfig: { key: Theme; icon: React.ReactNode; label: string }[] = [
-  { key: 'sunny', icon: <Sun className="w-4 h-4" />, label: 'Nắng' },
-  { key: 'rainy', icon: <CloudRain className="w-4 h-4" />, label: 'Mưa' },
-  { key: 'night', icon: <Moon className="w-4 h-4" />, label: 'Đêm' },
+const THEMES: { key: Theme; label: string; icon: React.ReactNode }[] = [
+  { key: 'sunny', label: 'Nắng', icon: <Sun className="h-4 w-4" /> },
+  { key: 'rainy', label: 'Mưa', icon: <CloudRain className="h-4 w-4" /> },
+  { key: 'night', label: 'Đêm', icon: <Moon className="h-4 w-4" /> },
 ];
 
 export function SettingsView() {
   const {
-    theme, setTheme, autoTheme, toggleAutoTheme,
-    isFullscreen, toggleFullscreen,
-    soundEnabled, toggleSound,
-    focusFogEnabled, toggleFocusFog,
-    accessories, equippedAccessory, equipAccessory,
+    theme,
+    setTheme,
+    autoTheme,
+    toggleAutoTheme,
+    isFullscreen,
+    toggleFullscreen,
+    soundEnabled,
+    toggleSound,
+    focusFogEnabled,
+    toggleFocusFog,
+    accessories,
+    equippedAccessory,
+    equipAccessory,
     currentStreak,
-    dailyGoal, setDailyGoal,
-    notificationsEnabled, toggleNotifications,
+    dailyGoal,
+    setDailyGoal,
+    notificationsEnabled,
+    toggleNotifications,
   } = useStore();
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.05 } },
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(() =>
+    typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'denied',
+  );
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installStatus, setInstallStatus] = useState<'idle' | 'accepted' | 'dismissed'>('idle');
+
+  useEffect(() => {
+    const handleBeforeInstall = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  const requestPermission = async () => {
+    if (!('Notification' in window)) return;
+    const permission = await Notification.requestPermission();
+    setNotificationPermission(permission);
   };
-  const item = {
-    hidden: { opacity: 0, y: 10 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    const result = await installPrompt.userChoice;
+    setInstallStatus(result.outcome);
+    setInstallPrompt(null);
   };
 
   return (
-    <motion.div
-      className="w-full h-full overflow-y-auto overflow-x-hidden pb-24"
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
+    <motion.section
+      className="h-full overflow-y-auto"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
     >
-      <div className="max-w-lg mx-auto px-4 pt-2 space-y-4">
-        {/* Header */}
-        <motion.div variants={item}>
-          <h1 className="text-xl font-display text-[var(--warm-brown-dark)]">⚙️ Cài đặt</h1>
-        </motion.div>
+      <div className="panel-section px-safe pb-nav pt-3 space-y-4">
+        <article className="panel-card">
+          <h2 className="font-display text-base text-[var(--text-strong)]">Tùy chỉnh trải nghiệm</h2>
+          <p className="mt-1 text-xs text-[var(--text-soft)]">
+            Tối ưu môi trường học cho mobile và sẵn sàng đóng gói Android app.
+          </p>
+        </article>
 
-        {/* General */}
-        <motion.div variants={item} className="glass-strong p-4 space-y-2">
-          <h3 className="text-xs font-medium text-[var(--warm-brown)]/50 uppercase tracking-wider mb-2">Chung</h3>
-          <ToggleSwitch
+        <article className="panel-card space-y-2.5">
+          <h3 className="text-xs uppercase tracking-[0.14em] text-[var(--text-soft)]">Focus & âm thanh</h3>
+          <ToggleRow
             enabled={autoTheme}
-            onChange={toggleAutoTheme}
+            onToggle={toggleAutoTheme}
             label="Tự động đổi theme"
-            icon={<Clock className="w-4 h-4" />}
-            description="Đổi theo thời gian thực"
+            description="Đổi theo thời gian trong ngày"
+            icon={<Sparkles className="h-4 w-4" />}
           />
-          <ToggleSwitch
+          <ToggleRow
             enabled={soundEnabled}
-            onChange={toggleSound}
-            label="Âm thanh ASMR"
-            icon={soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-            description="Tiếng thiên nhiên khi tập trung"
+            onToggle={toggleSound}
+            label="Âm thanh nền"
+            description="Nhẹ nhàng, giúp giữ nhịp tập trung"
+            icon={soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           />
-          <ToggleSwitch
+          <ToggleRow
             enabled={focusFogEnabled}
-            onChange={toggleFocusFog}
+            onToggle={toggleFocusFog}
             label="Focus Fog"
-            icon={<Sparkles className="w-4 h-4" />}
-            description="Làm mờ UI khi đang focus"
+            description="Làm mờ vùng ngoài để giảm nhiễu"
+            icon={<Moon className="h-4 w-4" />}
           />
-          <ToggleSwitch
-            enabled={notificationsEnabled}
-            onChange={toggleNotifications}
-            label="Thông báo"
-            icon={<Bell className="w-4 h-4" />}
-            description="Nhắc nhở khi hết session, break"
-          />
-        </motion.div>
+        </article>
 
-        {/* Theme Selector */}
+        <article className="panel-card space-y-2.5">
+          <h3 className="text-xs uppercase tracking-[0.14em] text-[var(--text-soft)]">Thông báo & nhắc nhở</h3>
+          <ToggleRow
+            enabled={notificationsEnabled}
+            onToggle={toggleNotifications}
+            label="Bật nhắc nhở học tập"
+            description="Session xong, break xong, task gần hạn, streak"
+            icon={<Bell className="h-4 w-4" />}
+          />
+          <div className="rounded-xl border border-white/60 bg-white/55 p-3">
+            <p className="text-xs text-[var(--text-soft)]">
+              Quyền thông báo hiện tại:{' '}
+              <span className="font-semibold text-[var(--text-strong)]">{notificationPermission}</span>
+            </p>
+            {notificationPermission !== 'granted' && (
+              <button className="btn-soft mt-2 px-3 py-2 text-xs" onClick={requestPermission}>
+                Cho phép thông báo
+              </button>
+            )}
+          </div>
+        </article>
+
         {!autoTheme && (
-          <motion.div variants={item} className="glass-strong p-4">
-            <h3 className="text-xs font-medium text-[var(--warm-brown)]/50 uppercase tracking-wider mb-3">Theme</h3>
-            <div className="flex gap-2">
-              {themeConfig.map((t) => (
-                <motion.button
-                  key={t.key}
-                  className={`flex-1 py-2.5 rounded-2xl flex items-center justify-center gap-2 text-sm font-medium transition-colors cursor-pointer ${
-                    theme === t.key
-                      ? 'bg-[var(--sage-green)] text-white'
-                      : 'bg-white/10 text-[var(--warm-brown)] active:bg-white/20'
+          <article className="panel-card">
+            <h3 className="mb-3 text-xs uppercase tracking-[0.14em] text-[var(--text-soft)]">Giao diện</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {THEMES.map((item) => (
+                <button
+                  key={item.key}
+                  className={`rounded-xl px-2 py-2.5 text-xs font-medium ${
+                    theme === item.key
+                      ? 'bg-[var(--color-primary-600)] text-white'
+                      : 'bg-white/60 text-[var(--text-soft)]'
                   }`}
-                  onClick={() => setTheme(t.key)}
-                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setTheme(item.key)}
                 >
-                  {t.icon}
-                  {t.label}
-                </motion.button>
+                  <span className="mb-1 inline-flex items-center justify-center">{item.icon}</span>
+                  <span className="block">{item.label}</span>
+                </button>
               ))}
             </div>
-          </motion.div>
+          </article>
         )}
 
-        {/* Current Theme (when auto) */}
-        {autoTheme && (
-          <motion.div variants={item} className="glass p-3 flex items-center justify-center gap-2 text-sm text-[var(--warm-brown)]">
-            {themeConfig.find((t) => t.key === theme)?.icon}
-            <span>{themeConfig.find((t) => t.key === theme)?.label} (Tự động)</span>
-          </motion.div>
-        )}
-
-        {/* Daily Goal */}
-        <motion.div variants={item} className="glass-strong p-4">
-          <h3 className="text-xs font-medium text-[var(--warm-brown)]/50 uppercase tracking-wider mb-3">
-            <Target className="w-3 h-3 inline mr-1" />
-            Mục tiêu hàng ngày
+        <article className="panel-card">
+          <h3 className="text-xs uppercase tracking-[0.14em] text-[var(--text-soft)]">
+            <Target className="mr-1 inline h-3.5 w-3.5" />
+            Mục tiêu mỗi ngày
           </h3>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-[var(--warm-brown)]">{dailyGoal} phiên/ngày</span>
+          <div className="mt-3 rounded-2xl border border-white/65 bg-white/55 px-3 py-3">
+            <div className="flex items-center justify-between text-sm text-[var(--text-strong)]">
+              <span>{dailyGoal} phiên / ngày</span>
+              <span className="chip-muted">1 - 12 phiên</span>
+            </div>
             <input
               type="range"
               min="1"
               max="12"
               value={dailyGoal}
-              onChange={(e) => setDailyGoal(parseInt(e.target.value))}
-              className="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[var(--sage-green)]"
+              onChange={(event) => setDailyGoal(Number(event.target.value))}
+              className="mt-2 w-full accent-[var(--color-primary-600)]"
+              aria-label="Mục tiêu số phiên mỗi ngày"
             />
           </div>
-        </motion.div>
+        </article>
 
-        {/* Accessories */}
-        {accessories.length > 0 && (
-          <motion.div variants={item} className="glass-strong p-4">
-            <h3 className="text-xs font-medium text-[var(--warm-brown)]/50 uppercase tracking-wider mb-3">
-              🎨 Trang phục Capybara
-            </h3>
-            <div className="flex gap-2 flex-wrap">
-              <motion.button
-                className={`w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer transition-colors ${
-                  !equippedAccessory
-                    ? 'bg-[var(--sage-green)] ring-2 ring-white/50'
-                    : 'bg-white/10 active:bg-white/20'
+        <article className="panel-card">
+          <h3 className="text-xs uppercase tracking-[0.14em] text-[var(--text-soft)]">Capy Accessories</h3>
+          {accessories.length === 0 ? (
+            <p className="mt-2 text-sm text-[var(--text-soft)]">
+              Chưa mở khóa accessory. Giữ streak để nhận quà.
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-sm ${
+                  !equippedAccessory ? 'bg-[var(--color-primary-600)] text-white' : 'bg-white/60 text-[var(--text-soft)]'
                 }`}
                 onClick={() => equipAccessory(null)}
-                whileTap={{ scale: 0.9 }}
               >
-                <span className="text-sm">❌</span>
-              </motion.button>
-              {accessories.map((acc) => (
-                <motion.button
-                  key={acc.id}
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer transition-colors ${
-                    equippedAccessory === acc.id
-                      ? 'bg-[var(--sage-green)] ring-2 ring-white/50'
-                      : 'bg-white/10 active:bg-white/20'
+                ✕
+              </button>
+              {accessories.map((item) => (
+                <button
+                  key={item.id}
+                  className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-lg ${
+                    equippedAccessory === item.id
+                      ? 'bg-[var(--color-primary-600)] text-white'
+                      : 'bg-white/60 text-[var(--text-strong)]'
                   }`}
-                  onClick={() => equipAccessory(acc.id)}
-                  whileTap={{ scale: 0.9 }}
-                  title={acc.name}
+                  onClick={() => equipAccessory(item.id)}
+                  title={item.name}
                 >
-                  <span className="text-lg">{acc.emoji}</span>
-                </motion.button>
+                  {item.emoji}
+                </button>
               ))}
             </div>
-            {(() => {
-              const next = ACCESSORY_REWARDS.find(
-                (r) => r.streak > currentStreak && !accessories.some((a) => a.id === r.id)
-              );
-              return next ? (
-                <p className="text-xs text-[var(--warm-brown)]/40 mt-2">
-                  Tiếp theo: {next.emoji} tại streak {next.streak}
-                </p>
-              ) : null;
-            })()}
-          </motion.div>
-        )}
+          )}
+          {(() => {
+            const nextReward = ACCESSORY_REWARDS.find(
+              (reward) => reward.streak > currentStreak && !accessories.some((item) => item.id === reward.id),
+            );
+            if (!nextReward) return null;
+            return (
+              <p className="mt-2 text-xs text-[var(--text-soft)]">
+                Tiếp theo: {nextReward.emoji} tại streak {nextReward.streak} ngày.
+              </p>
+            );
+          })()}
+        </article>
 
-        {/* Fullscreen */}
-        <motion.div variants={item}>
-          <motion.button
-            className="w-full py-3 rounded-2xl glass text-[var(--warm-brown)] text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
-            onClick={toggleFullscreen}
-            whileTap={{ scale: 0.98 }}
-          >
-            {isFullscreen ? (
-              <><Minimize className="w-4 h-4" /> Thoát toàn màn hình</>
-            ) : (
-              <><Maximize className="w-4 h-4" /> Chế độ toàn màn hình</>
-            )}
-          </motion.button>
-        </motion.div>
+        <article className="panel-card space-y-2.5">
+          <h3 className="text-xs uppercase tracking-[0.14em] text-[var(--text-soft)]">PWA & Android readiness</h3>
+          <div className="rounded-xl border border-white/65 bg-white/55 p-3 text-xs text-[var(--text-soft)]">
+            <p>Manifest, service worker, theme color và install prompt đã được chuẩn bị.</p>
+          </div>
+          {installPrompt ? (
+            <button className="btn-primary flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm" onClick={handleInstall}>
+              <Download className="h-4 w-4" />
+              Cài CapyFlow lên màn hình chính
+            </button>
+          ) : (
+            <div className="rounded-xl border border-white/65 bg-white/55 p-3 text-xs text-[var(--text-soft)]">
+              {installStatus === 'accepted'
+                ? 'Bạn đã chấp nhận cài đặt.'
+                : installStatus === 'dismissed'
+                  ? 'Bạn đã đóng prompt cài đặt.'
+                  : 'Nếu chưa thấy nút cài, mở menu trình duyệt và chọn "Add to Home screen".'}
+            </div>
+          )}
+        </article>
 
-        {/* About */}
-        <motion.div variants={item} className="glass p-4 text-center">
-          <span className="text-2xl block mb-1">🦫</span>
-          <h3 className="text-sm font-display text-[var(--warm-brown-dark)]">CapyFlow</h3>
-          <p className="text-xs text-[var(--warm-brown)]/40 mt-0.5">Focus with Capy • v2.0</p>
-          <p className="text-[10px] text-[var(--warm-brown)]/30 mt-1">
-            <Info className="w-3 h-3 inline mr-0.5" />
-            Web của Thiên Quốc
-          </p>
-        </motion.div>
-
-        <div className="h-4" />
+        <button className="btn-soft flex w-full items-center justify-center gap-2 py-3 text-sm" onClick={toggleFullscreen}>
+          {isFullscreen ? (
+            <>
+              <Minimize className="h-4 w-4" />
+              Thoát toàn màn hình
+            </>
+          ) : (
+            <>
+              <Maximize className="h-4 w-4" />
+              Chế độ toàn màn hình
+            </>
+          )}
+        </button>
       </div>
-    </motion.div>
+    </motion.section>
   );
 }

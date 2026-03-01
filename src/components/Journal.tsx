@@ -58,7 +58,8 @@ function JournalButton() {
 
   return (
     <motion.button
-      className="fixed bottom-6 right-6 w-14 h-14 rounded-full glass-strong flex items-center justify-center cursor-pointer z-40"
+      className="fixed right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-white/65 bg-white/85 backdrop-blur-lg"
+      style={{ bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))' }}
       onClick={toggleJournal}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
@@ -109,7 +110,7 @@ function JournalModal() {
         >
           {/* Journal book */}
           <motion.div
-            className="relative w-[400px] h-[500px] perspective-1000"
+            className="relative h-[min(78dvh,540px)] w-[min(92vw,420px)] perspective-1000"
             initial={{ scale: 0.8, rotateY: -30 }}
             animate={{ scale: 1, rotateY: 0 }}
             exit={{ scale: 0.8, rotateY: 30 }}

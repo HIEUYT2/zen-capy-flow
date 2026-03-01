@@ -1,50 +1,46 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Check, StickyNote } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Check, Plus, StickyNote, Trash2 } from 'lucide-react';
 import { useStore, type QuickNote } from '../store/useStore';
 
-function NoteItem({ note }: { note: QuickNote }) {
+function NoteRow({ note }: { note: QuickNote }) {
   const { toggleNoteCheck, deleteNote } = useStore();
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="flex items-start gap-2.5 group"
+      className="flex items-start gap-2.5 rounded-xl border border-white/60 bg-white/55 px-3 py-2.5"
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
     >
       {note.isChecklist ? (
-        <motion.button
-          className={`mt-0.5 w-5 h-5 min-w-[20px] rounded-md border-2 flex items-center justify-center cursor-pointer transition-colors ${
+        <button
+          className={`mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-md border-2 ${
             note.checked
-              ? 'bg-[var(--sage-green)] border-[var(--sage-green)]'
-              : 'border-[var(--warm-brown)]/25 hover:border-[var(--sage-green)]'
+              ? 'border-[var(--color-primary-600)] bg-[var(--color-primary-600)] text-white'
+              : 'border-[var(--color-primary-500)]/60 text-transparent'
           }`}
           onClick={() => toggleNoteCheck(note.id)}
-          whileTap={{ scale: 0.8 }}
+          aria-label={note.checked ? 'Bỏ chọn ghi chú' : 'Đánh dấu hoàn thành ghi chú'}
         >
-          {note.checked && <Check className="w-3 h-3 text-white" />}
-        </motion.button>
+          <Check className="h-3 w-3" />
+        </button>
       ) : (
-        <div className="mt-1.5 w-2 h-2 min-w-[8px] rounded-full bg-[var(--sage-green)]/60" />
+        <span className="mt-2 inline-block h-2 w-2 rounded-full bg-[var(--color-primary-500)]" />
       )}
-      <p
-        className={`flex-1 text-sm leading-relaxed ${
-          note.checked
-            ? 'line-through text-[var(--warm-brown)]/30'
-            : 'text-[var(--warm-brown-dark)]'
-        }`}
-      >
+
+      <p className={`flex-1 text-sm leading-relaxed ${note.checked ? 'text-[var(--text-soft)] line-through' : 'text-[var(--text-strong)]'}`}>
         {note.text}
       </p>
-      <motion.button
-        className="opacity-0 group-hover:opacity-100 w-6 h-6 min-w-[24px] rounded-lg flex items-center justify-center text-[var(--warm-brown)]/20 hover:text-red-400 cursor-pointer transition-opacity"
+
+      <button
+        className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-soft)] hover:bg-rose-100 hover:text-rose-600"
         onClick={() => deleteNote(note.id)}
-        whileTap={{ scale: 0.8 }}
+        aria-label="Xóa ghi chú"
       >
-        <X className="w-3 h-3" />
-      </motion.button>
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
     </motion.div>
   );
 }
@@ -58,113 +54,97 @@ export function QuickNotes({ compact = false }: QuickNotesProps) {
   const [showInput, setShowInput] = useState(false);
   const [text, setText] = useState('');
   const [isChecklist, setIsChecklist] = useState(false);
+  const [expandCompact, setExpandCompact] = useState(false);
 
-  const notes = compact ? quickNotes.slice(0, 4) : quickNotes;
+  const notes = compact && !expandCompact ? quickNotes.slice(0, 4) : quickNotes;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
     if (!text.trim()) return;
     addNote({ text: text.trim(), isChecklist });
     setText('');
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
-    }
-  };
-
   return (
-    <div className="w-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-display text-[var(--warm-brown-dark)] tracking-wide flex items-center gap-1.5">
-          <StickyNote className="w-3.5 h-3.5 text-[var(--sage-green)]" />
-          Ghi chú nhanh
-          {quickNotes.length > 0 && (
-            <span className="text-[var(--warm-brown)]/50 font-normal">({quickNotes.length})</span>
-          )}
-        </h3>
-        <motion.button
-          className="w-8 h-8 rounded-xl bg-[var(--soft-blue)]/20 flex items-center justify-center text-[var(--soft-blue)] cursor-pointer"
-          onClick={() => setShowInput(!showInput)}
-          whileTap={{ scale: 0.9 }}
-          animate={{ rotate: showInput ? 45 : 0 }}
+    <section>
+      <header className="mb-3 flex items-center justify-between">
+        <div>
+          <h3 className="font-display text-sm text-[var(--text-strong)] flex items-center gap-1.5">
+            <StickyNote className="h-4 w-4 text-[var(--color-accent-500)]" />
+            Quick Notes
+          </h3>
+          <p className="text-xs text-[var(--text-soft)]">{quickNotes.length} ghi chú cá nhân</p>
+        </div>
+        <button
+          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#dfeefd] text-[var(--color-accent-500)]"
+          onClick={() => setShowInput((prev) => !prev)}
+          aria-label={showInput ? 'Đóng form ghi chú' : 'Mở form ghi chú'}
         >
-          <Plus className="w-4 h-4" />
-        </motion.button>
-      </div>
+          <motion.span animate={{ rotate: showInput ? 45 : 0 }}>
+            <Plus className="h-4 w-4" />
+          </motion.span>
+        </button>
+      </header>
 
-      {/* Input */}
       <AnimatePresence>
         {showInput && (
           <motion.form
+            className="mb-3 overflow-hidden rounded-2xl border border-white/65 bg-white/55 p-3.5"
+            onSubmit={submit}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden mb-3"
-            onSubmit={handleSubmit}
           >
-            <div className="glass p-3 space-y-2">
-              <input
-                type="text"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ghi nhanh một ý..."
-                className="w-full px-3 py-2.5 bg-white/30 rounded-xl border border-white/20 text-sm
-                  text-[var(--warm-brown-dark)] placeholder:text-[var(--warm-brown)]/40
-                  focus:outline-none focus:ring-2 focus:ring-[var(--soft-blue)]/50"
-                autoFocus
-              />
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isChecklist}
-                    onChange={(e) => setIsChecklist(e.target.checked)}
-                    className="w-4 h-4 rounded accent-[var(--sage-green)] min-h-0 min-w-0"
-                  />
-                  <span className="text-xs text-[var(--warm-brown)]/60">Checklist</span>
-                </label>
-                <button
-                  type="submit"
-                  disabled={!text.trim()}
-                  className="px-3 py-1.5 rounded-lg bg-[var(--soft-blue)] text-white text-xs font-medium cursor-pointer
-                    active:scale-95 transition-transform disabled:opacity-40"
-                >
-                  Thêm
-                </button>
-              </div>
+            <input
+              type="text"
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              placeholder="Ví dụ: Tối xem lại đề cũ"
+              className="input-shell w-full text-sm"
+              maxLength={180}
+              autoFocus
+              aria-label="Nội dung ghi chú"
+            />
+            <div className="mt-2 flex items-center justify-between">
+              <label className="inline-flex items-center gap-2 text-xs text-[var(--text-soft)]">
+                <input
+                  type="checkbox"
+                  checked={isChecklist}
+                  onChange={(event) => setIsChecklist(event.target.checked)}
+                  className="h-4 w-4 min-h-0 min-w-0 accent-[var(--color-primary-600)]"
+                />
+                Dùng dạng checklist
+              </label>
+              <button className="btn-primary px-3 py-2 text-xs disabled:opacity-45" disabled={!text.trim()} type="submit">
+                Thêm ghi chú
+              </button>
             </div>
           </motion.form>
         )}
       </AnimatePresence>
 
-      {/* Notes list */}
       <div className="space-y-2">
         <AnimatePresence mode="popLayout">
           {notes.length === 0 && !showInput && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center text-sm text-[var(--warm-brown)]/40 py-3"
+              className="rounded-xl border border-dashed border-white/65 bg-white/45 py-4 text-center text-sm text-[var(--text-soft)]"
             >
-              Chưa có ghi chú 📝
+              Chưa có ghi chú, lưu nhanh một ý quan trọng.
             </motion.p>
           )}
           {notes.map((note) => (
-            <NoteItem key={note.id} note={note} />
+            <NoteRow key={note.id} note={note} />
           ))}
         </AnimatePresence>
       </div>
 
       {compact && quickNotes.length > 4 && (
-        <p className="text-center text-xs text-[var(--soft-blue)] font-medium mt-2 cursor-pointer">
-          Xem tất cả ({quickNotes.length}) →
-        </p>
+        <button className="mt-2 text-xs font-semibold text-[var(--color-accent-500)]" onClick={() => setExpandCompact((prev) => !prev)}>
+          {expandCompact ? 'Thu gọn' : `Xem thêm ${quickNotes.length - 4} ghi chú`}
+        </button>
       )}
-    </div>
+    </section>
   );
 }

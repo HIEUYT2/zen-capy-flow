@@ -49,7 +49,8 @@ export function FloatingNotes() {
       {/* Lotus Button (only show during focus session) */}
       {isActive && sessionType === 'focus' && (
         <motion.button
-          className="fixed bottom-24 right-6 z-40 w-14 h-14 rounded-full glass-strong flex items-center justify-center text-[var(--warm-brown)] shadow-lg cursor-pointer"
+          className="fixed right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-white/65 bg-white/85 text-[var(--warm-brown)] shadow-lg backdrop-blur-lg"
+          style={{ bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))' }}
           onClick={toggleFloatingNotesInput}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -76,7 +77,8 @@ export function FloatingNotes() {
 
             {/* Input Card */}
             <motion.div
-              className="fixed bottom-32 right-6 z-50 w-80"
+              className="fixed z-50 w-[calc(100%-1.5rem)] max-w-sm"
+              style={{ right: '0.75rem', bottom: 'calc(168px + env(safe-area-inset-bottom, 0px))' }}
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
@@ -107,7 +109,7 @@ export function FloatingNotes() {
                     type="text"
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyPress}
                     placeholder="Việc cần nhớ, suy nghĩ xao nhãng..."
                     className="flex-1 px-3 py-2 rounded-xl bg-white/20 border border-white/30 text-[var(--warm-brown-dark)] placeholder:text-[var(--warm-brown)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--sage-green)]/50"
                     autoFocus
@@ -156,7 +158,8 @@ export function FloatingNotes() {
       {/* Break Time Notes Display */}
       {sessionType === 'break' && unshownNotes.length > 0 && (
         <motion.div
-          className="fixed top-20 right-6 z-40 w-72"
+          className="fixed z-40 w-[calc(100%-1.5rem)] max-w-sm"
+          style={{ top: 'calc(84px + env(safe-area-inset-top, 0px))', right: '0.75rem' }}
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
         >

@@ -54,12 +54,13 @@ const ChatPanel = memo(function ChatPanel() {
     <AnimatePresence>
       {showCapyChat && (
         <motion.div
-          className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-40"
+          className="fixed left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2"
+          style={{ bottom: 'calc(106px + env(safe-area-inset-bottom, 0px))' }}
           initial={{ opacity: 0, y: 20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.9 }}
         >
-          <div className="glass-strong p-4 rounded-2xl w-80">
+          <div className="rounded-2xl border border-white/65 bg-white/85 p-4 shadow-[0_16px_30px_rgba(24,30,24,0.18)] backdrop-blur-xl">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-[var(--warm-brown)]">
                 🦫 Nói chuyện với Capy
@@ -78,7 +79,7 @@ const ChatPanel = memo(function ChatPanel() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Hôm nay bạn thế nào?"
-                className="flex-1 px-4 py-2 rounded-xl bg-white/50 border-none outline-none text-sm text-[var(--warm-brown)] placeholder:text-[var(--warm-brown)]/40"
+                className="input-shell flex-1 px-4 py-2 text-sm"
                 autoFocus
               />
               <motion.button
@@ -107,9 +108,10 @@ const ChatButton = memo(function ChatButton() {
 
   return (
     <motion.button
-      className={`fixed bottom-6 left-6 w-14 h-14 rounded-full flex items-center justify-center cursor-pointer z-40 transition-colors ${
-        showCapyChat ? 'bg-[var(--sage-green)]' : 'glass-strong'
+      className={`fixed left-4 z-40 flex h-14 w-14 items-center justify-center rounded-full transition-colors ${
+        showCapyChat ? 'bg-[var(--color-primary-600)]' : 'border border-white/65 bg-white/85 backdrop-blur-lg'
       }`}
+      style={{ bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))' }}
       onClick={toggleCapyChat}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}

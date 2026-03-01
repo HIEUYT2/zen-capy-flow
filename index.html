@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <link
@@ -10,24 +10,26 @@
     <!-- Mobile Optimized Viewport -->
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <!-- Prevent zoom on input focus (iOS) -->
     <meta name="format-detection" content="telephone=no" />
+    <meta name="application-name" content="CapyFlow" />
 
     <meta
       name="description"
-      content="CapyFlow - A premium, aesthetic Focus/Study app featuring an animated Capybara mascot, AI-driven music ambience, and anti-distraction features."
+      content="CapyFlow - Ứng dụng học tập tập trung với Pomodoro, task management, nhắc nhở và thống kê tiến độ."
     />
-    <meta name="theme-color" content="#9CAF88" />
+    <meta name="theme-color" content="#6d8b5a" />
 
     <!-- iOS Web App Capable -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="CapyFlow" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
     <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
@@ -43,23 +45,9 @@
         --safe-area-inset-right: env(safe-area-inset-right, 0px);
       }
 
-      /* Prevent double-tap zoom */
-      * {
-        touch-action: manipulation;
-      }
-
-      /* Prevent text selection on long press */
       body {
-        -webkit-user-select: none;
-        user-select: none;
-        -webkit-touch-callout: none;
-      }
-
-      /* Allow text selection on inputs */
-      input,
-      textarea {
-        -webkit-user-select: text;
-        user-select: text;
+        margin: 0;
+        background: #fdf7ea;
       }
     </style>
   </head>
